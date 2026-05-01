@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MagneticButton from '../components/react/MagneticButton';
+---
+
+<BaseLayout
+  title="404 — Page Not Found"
+  description="This page doesn't exist."
+  noindex={true}
+>
+  <section class="px-6 sm:px-8 lg:px-12 min-h-screen flex flex-col items-center justify-center text-center max-w-[1400px] mx-auto">
+    <p class="font-mono text-xs uppercase tracking-widest text-muted mb-6" style="letter-spacing: 0.15em;">
+      404
+    </p>
+    <h1
+      class="font-sans font-semibold text-foreground mb-6"
+      style="font-size: clamp(2.5rem, 8vw, 8rem); letter-spacing: -0.04em; line-height: 0.92;"
+    >
+      Lost on<br />the trail.
+    </h1>
+    <p class="text-muted max-w-md mb-12" style="font-size: 1.125rem; line-height: 1.6;">
+      This page wandered off the trail. Let's get you back on solid ground.
+    </p>
+    <MagneticButton
+      href="/"
+      className="inline-flex items-center gap-2 px-8 py-4 bg-foreground text-background font-semibold rounded-lg hover:bg-accent hover:text-background transition-colors duration-300 text-sm tracking-tight"
+      client:load
+    >
+      Back to home
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </MagneticButton>
+  </section>
+</BaseLayout>

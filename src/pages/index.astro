@@ -1,0 +1,195 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MagneticButton from '../components/react/MagneticButton';
+import ScrollReveal from '../components/react/ScrollReveal';
+
+type Project = CollectionEntry<'projects'>;
+
+const allProjects = await getCollection('projects');
+const featured = allProjects
+  .filter((p: Project) => p.data.featured)
+  .sort((a: Project, b: Project) => a.data.order - b.data.order);
+
+const skills = [
+  'Product Design', 'AI Engineering', 'UX / UI', 'Data Analysis',
+  'CAD Design', 'Manufacturing', 'Design Thinking', 'Python',
+  'Figma', 'Fusion 360', 'Power BI', 'JavaScript',
+  'Computer Science', 'Entrepreneurship', 'Research', 'Prototyping',
+];
+---
+
+<BaseLayout
+  title="Designer + Engineer"
+  description="Roberto Zúñiga — Designer + Engineer. Building products that combine design, engineering and AI for measurable positive impact."
+>
+  <!-- HERO -->
+  <section
+    class="relative min-h-screen flex flex-col justify-center px-6 sm:px-8 lg:px-12 pt-32 pb-24 overflow-hidden"
+    aria-label="Hero"
+  >
+    <!-- Background gradient -->
+    <div
+      class="absolute inset-0 pointer-events-none"
+      aria-hidden="true"
+      style="background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,92,0,0.04) 0%, transparent 70%);"
+    ></div>
+
+    <div class="max-w-[1400px] mx-auto w-full">
+      <p
+        class="font-mono text-xs uppercase tracking-widest text-muted mb-8"
+        style="letter-spacing: 0.15em;"
+      >
+        Designer + Engineer · Based in Madrid &amp; Logan, UT
+      </p>
+
+      <h1
+        class="font-sans font-semibold text-foreground leading-none"
+        style="font-size: clamp(3rem, 12vw, 12rem); letter-spacing: -0.04em; line-height: 0.95;"
+      >
+        Roberto<br />Zúñiga
+      </h1>
+
+      <p
+        class="mt-8 text-muted max-w-2xl"
+        style="font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.6;"
+      >
+        Building products that combine design, engineering and AI for measurable
+        positive impact.
+      </p>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div
+      class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 scroll-indicator"
+      aria-hidden="true"
+    >
+      <span class="font-mono text-xs uppercase tracking-widest text-muted" style="letter-spacing: 0.15em;">Scroll</span>
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none" aria-hidden="true">
+        <rect x="6.5" y="3" width="3" height="6" rx="1.5" fill="currentColor" class="text-muted"/>
+        <path d="M8 14L4 18L8 22L12 18L8 14Z" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- SELECTED WORK -->
+  <section
+    class="px-6 sm:px-8 lg:px-12 py-24 max-w-[1400px] mx-auto"
+    aria-labelledby="selected-work-heading"
+  >
+    <ScrollReveal client:visible>
+      <h2
+        id="selected-work-heading"
+        class="font-mono text-xs uppercase tracking-widest text-muted mb-12"
+        style="letter-spacing: 0.15em;"
+      >
+        Selected work
+      </h2>
+    </ScrollReveal>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+      {
+        featured.map((project: Project, i: number) => (
+          <ScrollReveal client:visible delay={i * 0.1}>
+            <article>
+              <a
+                href={`/projects/${project.id}`}
+                class="group block"
+                aria-label={`View ${project.data.title} — ${project.data.subtitle}`}
+              >
+                <div class="relative overflow-hidden rounded-2xl bg-subtle aspect-video mb-5">
+                  <Image
+                    src={project.data.cover}
+                    alt={project.data.title}
+                    width={960}
+                    height={540}
+                    format="webp"
+                    loading={i < 2 ? 'eager' : 'lazy'}
+                    class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.04]"
+                  />
+                </div>
+                <div class="px-1 overflow-hidden">
+                  <div class="translate-y-0 group-hover:-translate-y-0.5 transition-transform duration-500">
+                    <h3 class="text-xl font-semibold tracking-tight text-foreground group-hover:text-accent transition-colors duration-300">
+                      {project.data.title}
+                    </h3>
+                    <p class="font-mono text-xs uppercase tracking-widest text-muted mt-1.5">
+                      {project.data.subtitle}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </article>
+          </ScrollReveal>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section
+    class="px-6 sm:px-8 lg:px-12 py-24 border-t border-border"
+    aria-label="Philosophy"
+  >
+    <div class="max-w-[1400px] mx-auto">
+      <ScrollReveal client:visible>
+        <blockquote
+          class="text-foreground max-w-4xl mx-auto text-center"
+          style="font-size: clamp(1.25rem, 3vw, 2rem); line-height: 1.4; font-weight: 400; letter-spacing: -0.01em;"
+        >
+          Driven by a passion for meaningful innovation, I combine design, technology and engineering
+          to develop impactful solutions that foster a positive global future. As a proactive learner,
+          I thrive on solving complex problems — striving not only to meet expectations, but to exceed them.
+        </blockquote>
+      </ScrollReveal>
+    </div>
+  </section>
+
+  <!-- SKILLS MARQUEE -->
+  <section
+    class="py-12 border-t border-border overflow-hidden"
+    aria-label="Skills"
+    aria-hidden="true"
+  >
+    <div class="marquee-track" aria-hidden="true">
+      {
+        [...skills, ...skills].map((skill: string) => (
+          <span
+            class="font-mono text-xs uppercase tracking-widest text-muted/50 whitespace-nowrap px-6 py-2 border border-border rounded-full mx-2 flex-shrink-0"
+          >
+            {skill}
+          </span>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- CTA STRIP -->
+  <section
+    class="px-6 sm:px-8 lg:px-12 py-32 border-t border-border"
+    aria-label="Call to action"
+  >
+    <div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-start">
+      <MagneticButton
+        href="/work"
+        className="inline-flex items-center gap-2 px-8 py-4 bg-foreground text-background font-semibold rounded-lg hover:bg-accent hover:text-background transition-colors duration-300 text-sm tracking-tight"
+        client:load
+      >
+        View all work
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </MagneticButton>
+
+      <MagneticButton
+        href="/contact"
+        className="inline-flex items-center gap-2 px-8 py-4 border border-border text-foreground font-semibold rounded-lg hover:border-foreground/40 hover:text-foreground transition-colors duration-300 text-sm tracking-tight"
+        client:load
+      >
+        Get in touch
+      </MagneticButton>
+    </div>
+  </section>
+</BaseLayout>

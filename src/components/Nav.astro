@@ -1,0 +1,45 @@
+---
+const navLinks = [
+  { href: '/work', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const pathname = Astro.url.pathname;
+---
+
+<header
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-8 lg:px-12 py-5"
+  style="background: linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0) 100%); backdrop-filter: blur(0px);"
+>
+  <a
+    href="/"
+    class="font-mono text-xs uppercase tracking-widest text-foreground hover:text-accent transition-colors duration-300"
+    aria-label="Roberto Zúñiga — Home"
+  >
+    RZ
+  </a>
+
+  <nav aria-label="Main navigation">
+    <ul class="flex items-center gap-8">
+      {
+        navLinks.map(({ href, label }) => {
+          const isActive = pathname === href || pathname.startsWith(href + '/');
+          return (
+            <li>
+              <a
+                href={href}
+                class={`font-mono text-xs uppercase tracking-widest transition-colors duration-300 ${
+                  isActive ? 'text-accent' : 'text-muted hover:text-foreground'
+                }`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</header>

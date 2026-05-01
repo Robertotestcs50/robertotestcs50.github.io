@@ -1,0 +1,39 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border mt-32 py-12 px-6 sm:px-8 lg:px-12">
+  <div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+    <div>
+      <a
+        href="/"
+        class="font-mono text-xs uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-300"
+      >
+        Roberto Zúñiga
+      </a>
+      <p class="font-mono text-xs text-muted mt-1 tracking-wide">
+        Designer + Engineer · Madrid &amp; Logan, UT
+      </p>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <a
+        href="https://www.linkedin.com/in/robertozu%C3%B1igaes/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="font-mono text-xs uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-300"
+        aria-label="LinkedIn profile"
+      >
+        LinkedIn
+      </a>
+      <a
+        href="mailto:robertozces@gmail.com"
+        class="font-mono text-xs uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-300"
+        aria-label="Send email"
+      >
+        Email
+      </a>
+      <span class="font-mono text-xs text-muted">© {year}</span>
+    </div>
+  </div>
+</footer>

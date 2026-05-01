@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ScrollReveal from '../components/react/ScrollReveal';
+import CopyEmail from '../components/react/CopyEmail';
+import CityTime from '../components/react/CityTime';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Roberto Zúñiga — designer and engineer based in Madrid and Logan, UT."
+>
+  <section class="px-6 sm:px-8 lg:px-12 pt-40 pb-16 max-w-[1400px] mx-auto min-h-screen flex flex-col justify-between">
+    <div>
+      <ScrollReveal client:visible>
+        <h1
+          class="font-sans font-semibold text-foreground mb-16"
+          style="font-size: clamp(3.5rem, 10vw, 10rem); letter-spacing: -0.04em; line-height: 0.92;"
+        >
+          Let's talk.
+        </h1>
+      </ScrollReveal>
+
+      <!-- Email -->
+      <ScrollReveal client:visible delay={0.1}>
+        <div class="mb-16">
+          <p class="font-mono text-xs uppercase tracking-widest text-muted mb-4" style="letter-spacing: 0.15em;">
+            Email
+          </p>
+          <CopyEmail email="robertozces@gmail.com" client:load />
+        </div>
+      </ScrollReveal>
+
+      <!-- Links -->
+      <ScrollReveal client:visible delay={0.15}>
+        <div class="flex flex-wrap gap-4 mb-24">
+          <a
+            href="https://www.linkedin.com/in/robertozu%C3%B1igaes/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-6 py-3 border border-border text-foreground font-mono text-xs uppercase tracking-widest rounded-full hover:border-foreground/40 hover:text-foreground transition-colors duration-300"
+            aria-label="LinkedIn profile (opens in new tab)"
+          >
+            LinkedIn
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+
+          <a
+            href="https://cal.com/robertozuniga"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-background font-mono text-xs uppercase tracking-widest rounded-full hover:opacity-90 transition-opacity duration-300"
+            aria-label="Book a 15-minute call (opens in new tab)"
+          >
+            Book 15 min
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </ScrollReveal>
+
+      <!-- Locations -->
+      <ScrollReveal client:visible delay={0.2}>
+        <div class="border-t border-border pt-12">
+          <p class="font-mono text-xs uppercase tracking-widest text-muted mb-8" style="letter-spacing: 0.15em;">
+            Locations
+          </p>
+          <div class="flex flex-col sm:flex-row gap-12">
+            <CityTime
+              timezone="Europe/Madrid"
+              city="Madrid"
+              country="ES"
+              postal="28050"
+              client:load
+            />
+            <CityTime
+              timezone="America/Denver"
+              city="Logan"
+              country="UT"
+              postal="84321"
+              client:load
+            />
+          </div>
+        </div>
+      </ScrollReveal>
+    </div>
+  </section>
+</BaseLayout>

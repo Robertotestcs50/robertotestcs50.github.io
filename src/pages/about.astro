@@ -1,0 +1,200 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ScrollReveal from '../components/react/ScrollReveal';
+import SkillsGrid from '../components/react/SkillsGrid';
+import MagneticButton from '../components/react/MagneticButton';
+
+const skillColumns = [
+  {
+    heading: 'Hard skills',
+    items: [
+      'AI tools & research',
+      'Product design and development',
+      'Software design',
+      'Engineering',
+      'Data analysis',
+      'Computer science & programming',
+      'UX / UI',
+    ],
+  },
+  {
+    heading: 'Soft skills',
+    items: [
+      'Entrepreneurial mindset',
+      'Teamwork',
+      'Communication',
+      'Sales',
+      'Problem-solving',
+    ],
+  },
+  {
+    heading: 'Languages',
+    items: ['English', 'Spanish', 'French'],
+  },
+];
+
+const toolGroups = [
+  {
+    category: 'Design',
+    tools: ['Figma', 'Framer', 'Whimsical', 'Adobe Creative Suite'],
+  },
+  {
+    category: 'Engineering CAD',
+    tools: ['Fusion 360', 'CATIA', 'SolidWorks', 'Rhino', 'KeyShot'],
+  },
+  {
+    category: 'Code',
+    tools: ['Python', 'JavaScript', 'C', 'HTML', 'CSS'],
+  },
+  {
+    category: 'Data',
+    tools: ['Advanced Excel', 'Power BI', 'Power Query'],
+  },
+  {
+    category: 'AI',
+    tools: ['GPT', 'Claude', 'Vizcom'],
+  },
+  {
+    category: 'Manufacturing',
+    tools: ['CNC', 'Woodworking', '3D Printing', 'Materials Science'],
+  },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="Roberto Zúñiga — a proactive student from Spain with a global entrepreneurial vision, shaped by experiences in more than 15 countries."
+>
+  <!-- Hero -->
+  <section class="px-6 sm:px-8 lg:px-12 pt-40 pb-16 max-w-[1400px] mx-auto">
+    <ScrollReveal client:visible>
+      <p class="font-mono text-xs uppercase tracking-widest text-muted mb-4" style="letter-spacing: 0.15em;">
+        About
+      </p>
+      <h1
+        class="font-sans font-semibold text-foreground mb-10"
+        style="font-size: clamp(2.5rem, 6vw, 7rem); letter-spacing: -0.04em; line-height: 0.92;"
+      >
+        Roberto Zúñiga
+      </h1>
+    </ScrollReveal>
+
+    <ScrollReveal client:visible delay={0.1}>
+      <p
+        class="text-foreground/90 max-w-3xl"
+        style="font-size: clamp(1.125rem, 2vw, 1.375rem); line-height: 1.65;"
+      >
+        Roberto is a proactive student from Spain with a global entrepreneurial vision, shaped by experiences in
+        more than 15 countries across America and Europe. Curious by nature, he strives to intelligently
+        solve real-world problems.
+      </p>
+    </ScrollReveal>
+  </section>
+
+  <!-- Divider -->
+  <div class="border-t border-border mx-6 sm:mx-8 lg:mx-12"></div>
+
+  <!-- My Journey -->
+  <section class="px-6 sm:px-8 lg:px-12 py-20 max-w-[1400px] mx-auto" aria-labelledby="journey-heading">
+    <ScrollReveal client:visible>
+      <p class="font-mono text-xs uppercase tracking-widest text-muted mb-6" style="letter-spacing: 0.15em;" id="journey-heading">
+        My journey
+      </p>
+    </ScrollReveal>
+
+    <ScrollReveal client:visible delay={0.1}>
+      <p
+        class="text-foreground/80 max-w-2xl"
+        style="font-size: 1.125rem; line-height: 1.7;"
+      >
+        My journey speaks for itself. With scholarships and sponsorships everywhere I've gone, my passion
+        for design, engineering and technology drives me to create impactful work that aligns with
+        meaningful goals.
+      </p>
+    </ScrollReveal>
+  </section>
+
+  <!-- Skills -->
+  <section class="px-6 sm:px-8 lg:px-12 py-20 border-t border-border" aria-labelledby="skills-heading">
+    <div class="max-w-[1400px] mx-auto">
+      <ScrollReveal client:visible>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted mb-12" style="letter-spacing: 0.15em;" id="skills-heading">
+          Skills
+        </p>
+      </ScrollReveal>
+
+      <SkillsGrid columns={skillColumns} client:visible />
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="px-6 sm:px-8 lg:px-12 py-20 border-t border-border" aria-labelledby="tools-heading">
+    <div class="max-w-[1400px] mx-auto">
+      <ScrollReveal client:visible>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted mb-12" style="letter-spacing: 0.15em;" id="tools-heading">
+          Tools
+        </p>
+      </ScrollReveal>
+
+      <div class="space-y-8">
+        {toolGroups.map((group, i) => (
+          <ScrollReveal client:visible delay={i * 0.07}>
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8">
+              <p
+                class="font-mono text-xs uppercase tracking-widest text-muted flex-shrink-0"
+                style="min-width: 160px; letter-spacing: 0.15em;"
+              >
+                {group.category}
+              </p>
+              <div class="flex flex-wrap gap-2">
+                {group.tools.map((tool) => (
+                  <span class="font-mono text-xs text-foreground/80 bg-subtle border border-border px-4 py-1.5 rounded-full">
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="px-6 sm:px-8 lg:px-12 py-20 border-t border-border" aria-label="CV download">
+    <div class="max-w-[1400px] mx-auto flex flex-col gap-6 items-start">
+      <ScrollReveal client:visible>
+        <p class="text-muted" style="font-size: 1.125rem;">
+          Want to know me better?
+        </p>
+      </ScrollReveal>
+      <ScrollReveal client:visible delay={0.1}>
+        <MagneticButton
+          href="https://drive.google.com/file/d/1_ItsME3tmbkjk7zPxKkh3lMUK6Te3A0t/view"
+          className="inline-flex items-center gap-2 px-8 py-4 bg-foreground text-background font-semibold rounded-lg hover:bg-accent hover:text-background transition-colors duration-300 text-sm tracking-tight"
+          client:load
+          aria-label="Download CV (opens in new tab)"
+        >
+          Download CV
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 2V10M8 10L5 7M8 10L11 7M2 12H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </MagneticButton>
+      </ScrollReveal>
+    </div>
+  </section>
+
+  <!-- Closing -->
+  <section class="px-6 sm:px-8 lg:px-12 py-24 border-t border-border" aria-label="Closing statement">
+    <div class="max-w-[1400px] mx-auto">
+      <ScrollReveal client:visible>
+        <p
+          class="text-foreground font-semibold max-w-3xl"
+          style="font-size: clamp(1.75rem, 4vw, 3.5rem); letter-spacing: -0.03em; line-height: 1.1;"
+        >
+          We just have one life.<br />Are you being the person<br />you want to be in it?
+        </p>
+      </ScrollReveal>
+    </div>
+  </section>
+</BaseLayout>
