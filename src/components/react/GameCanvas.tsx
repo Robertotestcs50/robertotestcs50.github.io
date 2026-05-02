@@ -349,10 +349,13 @@ export default function GameCanvas() {
 
   const [loopRunning, setLoopRunning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const isMobileGame = useRef(false);
 
-  // Detect touch-only
+  // Detect touch-only and mobile screen width (once on mount)
   useEffect(() => {
-    setIsMobile(window.matchMedia('(hover: none)').matches);
+    const touch = window.matchMedia('(hover: none)').matches;
+    setIsMobile(touch);
+    isMobileGame.current = window.innerWidth < 768;
   }, []);
 
   // Resize observer
@@ -382,7 +385,7 @@ export default function GameCanvas() {
     const s = state.current;
     const { canvasW, canvasH } = s;
     s.score = 0;
-    s.speed = 4;
+    s.speed = isMobileGame.current ? 5.5 : 4;
     s.frameCount = 0;
     s.sinceLastObs = 0;
     s.dead = false;
@@ -450,7 +453,7 @@ export default function GameCanvas() {
     }
     if (s.dead) return;
     if (s.player && s.player.onGround) {
-      s.player.vy = JUMP_V;
+      s.player.vy = isMobileGame.current ? -14 : JUMP_V;
       s.player.onGround = false;
     }
   }, []);
@@ -502,8 +505,8 @@ export default function GameCanvas() {
     // ── Update ──────────────────────────────────────────────────────────────
 
     if (!s.dead) {
-      // Speed ramp
-      s.speed += 0.0008;
+      // Speed ramp — faster on mobile
+      s.speed += isMobileGame.current ? 0.001 : 0.0008;
       s.score = Math.floor(s.frameCount * s.speed * 0.1);
       s.frameCount++;
       s.sinceLastObs++;

@@ -23,6 +23,25 @@
     color-scheme: dark;
   }
 
+  /* Mobile nav — prevent overflow on very small screens */
+  @media (max-width: 380px) {
+    header nav a {
+      font-size: 11px !important;
+      letter-spacing: 0.05em !important;
+    }
+    header nav ul {
+      gap: 1rem !important;
+    }
+  }
+
+  /* Home hero title — prevent overflow on very small screens */
+  @media (max-width: 360px) {
+    .hero-title {
+      font-size: clamp(2.5rem, 12vw, 12rem) !important;
+      word-break: break-word;
+    }
+  }
+
   * {
     box-sizing: border-box;
   }

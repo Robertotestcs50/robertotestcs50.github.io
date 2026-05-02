@@ -66,8 +66,11 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
   title={project.data.title}
   description={project.data.summary}
 >
-  <!-- Hero -->
-  <section class="relative w-full overflow-hidden" style="height: min(80vh, 640px);" aria-label="Project hero">
+  <!-- Hero — aspect-ratio:4/3 on mobile, fixed height on md+ -->
+  <section
+    class="relative w-full overflow-hidden aspect-[4/3] md:aspect-auto md:[height:min(80vh,640px)]"
+    aria-label="Project hero"
+  >
     <Image
       src={project.data.cover}
       alt={project.data.title}
@@ -100,15 +103,20 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
   <div class="px-6 sm:px-8 lg:px-12 py-16 max-w-[1400px] mx-auto">
     <div class="flex flex-col lg:flex-row gap-16 lg:gap-20">
 
-      <!-- Sidebar -->
+      <!-- Sidebar — 2-col grid on mobile, sticky column on lg -->
       <aside class="lg:w-[30%] flex-shrink-0" aria-label="Project metadata">
-        <div class="lg:sticky lg:top-32 space-y-8">
+        <div class="grid grid-cols-2 gap-x-6 gap-y-6 lg:block lg:sticky lg:top-32 lg:space-y-8">
           <div>
             <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Client</p>
             <p class="text-foreground text-sm">{project.data.client}</p>
           </div>
 
           <div>
+            <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Date</p>
+            <p class="text-foreground text-sm">{formatDate(project.data.date)}</p>
+          </div>
+
+          <div class="col-span-2 lg:col-auto">
             <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Services</p>
             <div class="flex flex-wrap gap-2">
               {project.data.services.map((s: string) => (
@@ -119,7 +127,7 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
             </div>
           </div>
 
-          <div>
+          <div class="col-span-2 lg:col-auto">
             <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Industries</p>
             <div class="flex flex-wrap gap-2">
               {project.data.industries.map((ind: string) => (
@@ -130,13 +138,8 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
             </div>
           </div>
 
-          <div>
-            <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Date</p>
-            <p class="text-foreground text-sm">{formatDate(project.data.date)}</p>
-          </div>
-
           {project.data.links && project.data.links.length > 0 && (
-            <div>
+            <div class="col-span-2 lg:col-auto">
               <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Links</p>
               <div class="flex flex-col gap-2">
                 {project.data.links.map((link: { label: string; url: string; type: string }) => {
@@ -158,7 +161,7 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
           )}
 
           {project.data.tags && (
-            <div>
+            <div class="col-span-2 lg:col-auto">
               <p class="font-mono text-xs uppercase tracking-widest text-muted mb-2" style="letter-spacing: 0.15em;">Tags</p>
               <div class="flex flex-wrap gap-2">
                 {project.data.tags.map((tag: string) => (
