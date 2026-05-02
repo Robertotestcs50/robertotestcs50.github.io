@@ -5,6 +5,9 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MagneticButton from '../components/react/MagneticButton';
 import ScrollReveal from '../components/react/ScrollReveal';
+import ParallaxPhoto from '../components/react/ParallaxPhoto';
+import GameCanvas from '../components/react/GameCanvas';
+import heroWalking from '../assets/hero-walking.jpg';
 
 type Project = CollectionEntry<'projects'>;
 
@@ -147,6 +150,20 @@ const skills = [
     </div>
   </section>
 
+  <!-- WALKING PHOTO -->
+  <section
+    class="px-6 sm:px-8 lg:px-12 py-8"
+    aria-label="Photo"
+  >
+    <ParallaxPhoto
+      client:visible
+      src={heroWalking.src}
+      alt="Walking through Florence — Roberto Zúñiga"
+      width={heroWalking.width}
+      height={heroWalking.height}
+    />
+  </section>
+
   <!-- SKILLS MARQUEE -->
   <section
     class="py-12 border-t border-border overflow-hidden"
@@ -191,5 +208,17 @@ const skills = [
         Get in touch
       </MagneticButton>
     </div>
+  </section>
+  <!-- GAME -->
+  <section
+    aria-label="Mini game"
+    style="max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 6rem;"
+  >
+    <p
+      style="font-family: 'Geist Mono', monospace; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; color: var(--color-muted); margin-bottom: 1.5rem;"
+    >
+      // need a break? you've earned it.
+    </p>
+    <GameCanvas client:visible />
   </section>
 </BaseLayout>

@@ -17,7 +17,16 @@ const projects = defineCollection({
       summary: z.string(),
       description: z.string(),
       closing: z.string().optional(),
+      coverPosition: z.string().optional().default('center'),
       gallery: z.array(img()).optional(),
+      carousels: z
+        .array(
+          z.object({
+            title: z.string(),
+            images: z.array(img()),
+          })
+        )
+        .optional(),
       links: z
         .array(
           z.object({

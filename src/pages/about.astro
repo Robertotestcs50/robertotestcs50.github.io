@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ScrollReveal from '../components/react/ScrollReveal';
 import SkillsGrid from '../components/react/SkillsGrid';
 import MagneticButton from '../components/react/MagneticButton';
+import { Image } from 'astro:assets';
+import aboutPhoto from '../assets/about-photo.jpg';
 
 const skillColumns = [
   {
@@ -88,6 +90,22 @@ const toolGroups = [
         more than 15 countries across America and Europe. Curious by nature, he strives to intelligently
         solve real-world problems.
       </p>
+    </ScrollReveal>
+
+    <!-- About photo -->
+    <ScrollReveal client:visible delay={0.2}>
+      <div class="mt-14" style="max-width: 900px; margin-top: 3.5rem;">
+        <Image
+          src={aboutPhoto}
+          alt="Roberto Zúñiga working with collaborators"
+          width={900}
+          height={506}
+          format="webp"
+          loading="lazy"
+          class="w-full rounded-2xl"
+          style="aspect-ratio: 16/9; object-fit: cover; object-position: center 30%;"
+        />
+      </div>
     </ScrollReveal>
   </section>
 
@@ -175,7 +193,7 @@ const toolGroups = [
           client:load
           aria-label="Download CV (opens in new tab)"
         >
-          Download CV
+          Download my journey
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 2V10M8 10L5 7M8 10L11 7M2 12H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>

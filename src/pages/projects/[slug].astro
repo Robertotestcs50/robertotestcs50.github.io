@@ -5,8 +5,9 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ScrollReveal from '../../components/react/ScrollReveal';
+import PhaseCarouselGroup from '../../components/react/PhaseCarouselGroup';
 import { formatDate } from '../../lib/utils';
-import { ExternalLink, Play, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, Play, Github, Instagram, FileText } from 'lucide-react';
 
 type Project = CollectionEntry<'projects'>;
 
@@ -27,11 +28,24 @@ const nextProject = sorted[(currentIndex + 1) % sorted.length] as Project;
 
 const linkIconMap: Record<string, typeof ExternalLink> = {
   demo: Play,
-  github: ArrowUpRight,
-  article: ExternalLink,
-  instagram: ArrowUpRight,
+  github: Github,
+  article: FileText,
+  instagram: Instagram,
   external: ExternalLink,
 };
+
+const coverPos = project.data.coverPosition ?? 'center';
+
+// Prepare carousels for client island — serialize ImageMetadata to plain objects
+const carouselData = project.data.carousels?.map((c) => ({
+  title: c.title,
+  images: c.images.map((img: ImageMetadata) => ({
+    src: img.src,
+    width: img.width,
+    height: img.height,
+    alt: '',
+  })),
+}));
 ---
 
 <BaseLayout
@@ -48,6 +62,7 @@ const linkIconMap: Record<string, typeof ExternalLink> = {
       format="webp"
       loading="eager"
       class="w-full h-full object-cover"
+      style={`object-position: ${coverPos};`}
     />
     <div
       class="absolute inset-0"
@@ -160,7 +175,14 @@ const linkIconMap: Record<string, typeof ExternalLink> = {
           </div>
         </ScrollReveal>
 
-        {project.data.gallery && project.data.gallery.length > 0 && (
+        <!-- Carousels (Plan Z) or flat gallery -->
+        {carouselData && carouselData.length > 0 ? (
+          <ScrollReveal client:visible delay={0.15}>
+            <div class="mb-16">
+              <PhaseCarouselGroup client:visible carousels={carouselData} />
+            </div>
+          </ScrollReveal>
+        ) : project.data.gallery && project.data.gallery.length > 0 ? (
           <ScrollReveal client:visible delay={0.15}>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16" aria-label="Project gallery">
               {project.data.gallery.map((img: ImageMetadata, i: number) => (
@@ -178,7 +200,7 @@ const linkIconMap: Record<string, typeof ExternalLink> = {
               ))}
             </div>
           </ScrollReveal>
-        )}
+        ) : null}
 
         {project.data.closing && (
           <ScrollReveal client:visible delay={0.2}>
