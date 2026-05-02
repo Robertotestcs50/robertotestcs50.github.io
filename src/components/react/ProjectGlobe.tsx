@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { JOURNEY, getUniqueStops } from '../../lib/travel-journey'
 
 interface ProjectData {
   slug: string
@@ -110,6 +111,23 @@ function buildTangentFrame(normal: THREE.Vector3): {
   t1.normalize()
   const t2 = new THREE.Vector3().crossVectors(normal, t1).normalize()
   return { t1, t2 }
+}
+
+function slerpOnSphere(
+  a: THREE.Vector3,
+  b: THREE.Vector3,
+  t: number,
+  radius: number,
+): THREE.Vector3 {
+  const aN = a.clone().normalize()
+  const bN = b.clone().normalize()
+  const dot = THREE.MathUtils.clamp(aN.dot(bN), -1, 1)
+  const omega = Math.acos(dot)
+  const sinOmega = Math.sin(omega)
+  if (sinOmega < 0.0001) return aN.clone().multiplyScalar(radius)
+  const w1 = Math.sin((1 - t) * omega) / sinOmega
+  const w2 = Math.sin(t * omega) / sinOmega
+  return new THREE.Vector3().addScaledVector(aN, w1).addScaledVector(bN, w2).multiplyScalar(radius)
 }
 
 // ─── Info card ────────────────────────────────────────────────────────────────
@@ -459,8 +477,335 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
 
     glowsRef.current = glows
     pinDotsRef.current = pinDots
-    hitboxesRef.current = hitboxes.filter(Boolean) // compact sparse array
+    hitboxesRef.current = hitboxes.filter(Boolean)
     pinWorldRef.current = pinWorldPositions
+
+    // ── Journey state ────────────────────────────────────────────────────────────
+    const TRAIL_SAMPLES = isMobile ? 20 : 30
+    const SUDAN_LAT = 4.8594
+    const SUDAN_LNG = 31.5713
+
+    const journey = {
+      stopIdx: 1 as number,
+      progress: 0 as number,
+      phase: 'pausing' as 'moving' | 'pausing',
+      pauseElapsed: 0 as number,
+      visitedPins: new Set<number>(),
+      arcSet: new Set<string>(),
+      figureGroup: null as THREE.Group | null,
+      leftLeg: null as THREE.Line | null,
+      rightLeg: null as THREE.Line | null,
+      legPhase: 0 as number,
+      trailPoints: [] as THREE.Vector3[],
+      trailLine: null as THREE.Line | null,
+      africaMadridLine: null as THREE.Line | null,
+      africaLoganLine: null as THREE.Line | null,
+      africaDashTimer: 0 as number,
+      currentCrumb: null as THREE.Mesh | null,
+      interactionPaused: false as boolean,
+    }
+
+    // Check if a journey stop is near a project pin (within ~2.5°)
+    const getPinNear = (lat: number, lng: number): number | null => {
+      for (let i = 0; i < projectsWithLocation.length; i++) {
+        const loc = projectsWithLocation[i].location!
+        if (Math.abs(loc.lat - lat) < 2.5 && Math.abs(loc.lng - lng) < 2.5) return i
+      }
+      return null
+    }
+
+    // Draw a permanent orange great-circle arc between two project pins
+    const drawPermanentArc = (pinA: number, pinB: number) => {
+      const posA = pinWorldRef.current[pinA]
+      const posB = pinWorldRef.current[pinB]
+      if (!posA || !posB) return
+      const key = `${Math.min(pinA, pinB)}-${Math.max(pinA, pinB)}`
+      if (journey.arcSet.has(key)) return
+      journey.arcSet.add(key)
+      const pts = Array.from({ length: 36 }, (_, i) =>
+        slerpOnSphere(posA, posB, i / 35, 1.055),
+      )
+      const arc = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.22 }),
+      )
+      scene.add(arc)
+    }
+
+    // Orient the figure: Y = outward normal, faces direction of travel
+    const orientFigure = (
+      group: THREE.Group,
+      currentPos: THREE.Vector3,
+      nextPos: THREE.Vector3,
+    ) => {
+      group.position.copy(currentPos)
+      const up = currentPos.clone().normalize()
+      const rawFwd = nextPos.clone().sub(currentPos).normalize()
+      let fwd = rawFwd.clone().sub(up.clone().multiplyScalar(rawFwd.dot(up)))
+      if (fwd.length() < 0.001) {
+        group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up)
+        return
+      }
+      fwd.normalize()
+      const right = fwd.clone().cross(up).normalize()
+      group.quaternion.setFromRotationMatrix(
+        new THREE.Matrix4().makeBasis(right, up, fwd.clone().negate()),
+      )
+    }
+
+    // Animate legs in local space (Z = travel direction, swing forward/back)
+    const animateLegs = (legPhase: number) => {
+      const swing = Math.sin(legPhase * Math.PI * 2) * 0.022
+      ;([journey.leftLeg, journey.rightLeg] as (THREE.Line | null)[]).forEach((leg, side) => {
+        if (!leg) return
+        const attr = leg.geometry.attributes.position as THREE.BufferAttribute
+        attr.setZ(1, side === 0 ? swing : -swing)
+        attr.needsUpdate = true
+      })
+    }
+
+    // ── Travel breadcrumbs (small white dots at each unique journey city) ────────
+    const uniqueStops = getUniqueStops()
+    uniqueStops.forEach((stop) => {
+      const pos = latLngTo3D(stop.lat, stop.lng, 1.012)
+      const isCurrent = stop.type === 'current'
+      const crumb = new THREE.Mesh(
+        new THREE.SphereGeometry(isCurrent ? 0.008 : 0.005, 6, 6),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.45 }),
+      )
+      crumb.position.copy(pos)
+      crumb.userData.isCrumb = true
+      scene.add(crumb)
+      if (isCurrent) journey.currentCrumb = crumb
+    })
+
+    // ── Walking stick figure ─────────────────────────────────────────────────────
+    const figLineMat = () =>
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 })
+
+    const figureGroup = new THREE.Group()
+
+    const figHead = new THREE.Mesh(
+      new THREE.SphereGeometry(0.012, 6, 6),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 }),
+    )
+    figHead.position.set(0, 0.062, 0)
+    figureGroup.add(figHead)
+
+    figureGroup.add(
+      Object.assign(
+        new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0.018, 0),
+            new THREE.Vector3(0, 0.052, 0),
+          ]),
+          figLineMat(),
+        ),
+      ),
+    )
+    figureGroup.add(
+      new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(-0.018, 0.042, 0),
+          new THREE.Vector3(0.018, 0.042, 0),
+        ]),
+        figLineMat(),
+      ),
+    )
+
+    const leftLegGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0.018, 0),
+      new THREE.Vector3(0, 0, 0),
+    ])
+    const leftLeg = new THREE.Line(leftLegGeo, figLineMat())
+    figureGroup.add(leftLeg)
+
+    const rightLegGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0.018, 0),
+      new THREE.Vector3(0, 0, 0),
+    ])
+    const rightLeg = new THREE.Line(rightLegGeo, figLineMat())
+    figureGroup.add(rightLeg)
+
+    journey.figureGroup = figureGroup
+    journey.leftLeg = leftLeg
+    journey.rightLeg = rightLeg
+
+    if (reducedMotion.current) {
+      const madridPos = latLngTo3D(40.4168, -3.7038, 1.04)
+      figureGroup.position.copy(madridPos)
+      figureGroup.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        madridPos.clone().normalize(),
+      )
+    }
+    scene.add(figureGroup)
+
+    // ── Trail line ───────────────────────────────────────────────────────────────
+    const trailLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3()]),
+      new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.18 }),
+    )
+    scene.add(trailLine)
+    journey.trailLine = trailLine
+
+    // ── Africa Crutches storytelling — dashed arcs ────────────────────────────────
+    const makeAfricaArc = (fromLat: number, fromLng: number): THREE.Line => {
+      const fromPos = latLngTo3D(fromLat, fromLng, 1.05)
+      const toPos = latLngTo3D(SUDAN_LAT, SUDAN_LNG, 1.05)
+      const pts = Array.from({ length: 48 }, (_, i) =>
+        slerpOnSphere(fromPos, toPos, i / 47, 1.05),
+      )
+      const geo = new THREE.BufferGeometry().setFromPoints(pts)
+      const mat = new THREE.LineDashedMaterial({
+        color: 0xff5c00,
+        dashSize: 0.04,
+        gapSize: 0.025,
+        transparent: true,
+        opacity: 0.4,
+      })
+      const line = new THREE.Line(geo, mat)
+      line.computeLineDistances()
+      line.visible = false
+      scene.add(line)
+      return line
+    }
+    journey.africaMadridLine = makeAfricaArc(40.4168, -3.7038)
+    journey.africaLoganLine = makeAfricaArc(41.7370, -111.8338)
+
+    // Reduced motion: draw all project-pin arcs instantly + show Africa lines static
+    if (reducedMotion.current) {
+      const pins = pinWorldRef.current.filter(Boolean)
+      for (let a = 0; a < pins.length; a++) {
+        for (let b = a + 1; b < pins.length; b++) {
+          const pts = Array.from({ length: 32 }, (_, i) =>
+            slerpOnSphere(pins[a], pins[b], i / 31, 1.055),
+          )
+          scene.add(
+            new THREE.Line(
+              new THREE.BufferGeometry().setFromPoints(pts),
+              new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.2 }),
+            ),
+          )
+        }
+      }
+      if (journey.africaMadridLine) {
+        journey.africaMadridLine.visible = true
+        ;(journey.africaMadridLine.material as THREE.LineDashedMaterial).opacity = 0.35
+      }
+      if (journey.africaLoganLine) {
+        journey.africaLoganLine.visible = true
+        ;(journey.africaLoganLine.material as THREE.LineDashedMaterial).opacity = 0.35
+      }
+    }
+
+    // ── Journey update — called each frame ───────────────────────────────────────
+    const updateJourney = (dt: number, elapsed: number) => {
+      if (reducedMotion.current || journey.interactionPaused) {
+        // Pulse current breadcrumb only
+        if (journey.currentCrumb) {
+          ;(journey.currentCrumb.material as THREE.MeshBasicMaterial).opacity =
+            0.45 + 0.45 * (0.5 + 0.5 * Math.sin(elapsed * 2))
+        }
+        return
+      }
+
+      const stop = JOURNEY[journey.stopIdx]
+
+      if (journey.phase === 'pausing') {
+        journey.pauseElapsed += dt
+
+        const nearPin = getPinNear(stop.lat, stop.lng)
+        if (nearPin !== null && !journey.visitedPins.has(nearPin)) {
+          journey.visitedPins.add(nearPin)
+          if (journey.visitedPins.size > 1) {
+            Array.from(journey.visitedPins)
+              .filter((p) => p !== nearPin)
+              .forEach((p) => drawPermanentArc(nearPin, p))
+          }
+        }
+
+        // Africa Crutches storytelling moment
+        const isAfricaMoment =
+          (stop.type === 'home' || stop.type === 'current' || stop.type === 'study') &&
+          (stop.country === 'Spain' || stop.city === 'Logan, UT')
+
+        if (isAfricaMoment) {
+          journey.africaDashTimer += dt
+          const opacity = 0.2 + 0.3 * (0.5 + 0.5 * Math.sin(journey.africaDashTimer * Math.PI))
+          if (journey.africaMadridLine) {
+            journey.africaMadridLine.visible = stop.country === 'Spain'
+            if (stop.country === 'Spain')
+              ;(journey.africaMadridLine.material as THREE.LineDashedMaterial).opacity = opacity
+          }
+          if (journey.africaLoganLine) {
+            journey.africaLoganLine.visible = stop.city === 'Logan, UT'
+            if (stop.city === 'Logan, UT')
+              ;(journey.africaLoganLine.material as THREE.LineDashedMaterial).opacity = opacity
+          }
+        } else {
+          if (journey.africaMadridLine) journey.africaMadridLine.visible = false
+          if (journey.africaLoganLine) journey.africaLoganLine.visible = false
+          journey.africaDashTimer = 0
+        }
+
+        const pauseDur =
+          stop.type === 'home' || stop.type === 'current' ? 1.5 :
+          stop.type === 'study' ? 1.2 : 0.4
+        const pinBonus = nearPin !== null ? 1.5 : 0
+
+        if (journey.pauseElapsed >= pauseDur + pinBonus) {
+          journey.phase = 'moving'
+          journey.stopIdx = (journey.stopIdx + 1) % JOURNEY.length
+          journey.progress = 0
+          journey.pauseElapsed = 0
+          journey.trailPoints = []
+          if (journey.africaMadridLine) journey.africaMadridLine.visible = false
+          if (journey.africaLoganLine) journey.africaLoganLine.visible = false
+        }
+      } else {
+        // Moving along great-circle arc
+        const prevIdx = (journey.stopIdx - 1 + JOURNEY.length) % JOURNEY.length
+        const fromStop = JOURNEY[prevIdx]
+        const fromPos = latLngTo3D(fromStop.lat, fromStop.lng, 1.04)
+        const toPos = latLngTo3D(stop.lat, stop.lng, 1.04)
+
+        const angle = Math.acos(
+          THREE.MathUtils.clamp(fromPos.clone().normalize().dot(toPos.clone().normalize()), -1, 1),
+        )
+        const legDur = Math.max(1.5, angle * 4.5)
+        journey.progress = Math.min(1, journey.progress + dt / legDur)
+
+        const currentPos = slerpOnSphere(fromPos, toPos, journey.progress, 1.04)
+        const nextPos = slerpOnSphere(fromPos, toPos, Math.min(journey.progress + 0.02, 1), 1.04)
+
+        if (journey.figureGroup) {
+          orientFigure(journey.figureGroup, currentPos, nextPos)
+          journey.legPhase = (journey.legPhase + dt * 3.5) % 1
+          animateLegs(journey.legPhase)
+        }
+
+        // Rebuild trail geometry
+        journey.trailPoints.push(currentPos.clone())
+        if (journey.trailPoints.length > TRAIL_SAMPLES) journey.trailPoints.shift()
+        if (journey.trailLine && journey.trailPoints.length > 1) {
+          const newGeo = new THREE.BufferGeometry().setFromPoints(journey.trailPoints)
+          journey.trailLine.geometry.dispose()
+          journey.trailLine.geometry = newGeo
+        }
+
+        if (journey.progress >= 1) {
+          journey.phase = 'pausing'
+          journey.pauseElapsed = 0
+        }
+      }
+
+      // Pulse current-location breadcrumb
+      if (journey.currentCrumb) {
+        ;(journey.currentCrumb.material as THREE.MeshBasicMaterial).opacity =
+          0.45 + 0.45 * (0.5 + 0.5 * Math.sin(elapsed * 2))
+      }
+    }
 
     // ── OrbitControls (Bug 4: zoom enabled; Bug 7: keys disabled) ──
     const controls = new OrbitControls(camera, renderer.domElement)
@@ -476,15 +821,20 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(controls as any).enableKeys = false // Bug 7: stop OrbitControls eating key events
 
+    let figureResumeTimer: ReturnType<typeof setTimeout> | null = null
     const pauseRotate = () => {
       controls.autoRotate = false
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+      journey.interactionPaused = true
+      if (figureResumeTimer) clearTimeout(figureResumeTimer)
     }
     const scheduleResume = () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
       if (!reducedMotion.current) {
         resumeTimerRef.current = setTimeout(() => { controls.autoRotate = true }, 3000)
       }
+      if (figureResumeTimer) clearTimeout(figureResumeTimer)
+      figureResumeTimer = setTimeout(() => { journey.interactionPaused = false }, 1000)
     }
     renderer.domElement.addEventListener('mousedown', pauseRotate)
     renderer.domElement.addEventListener('touchstart', pauseRotate, { passive: true })
@@ -493,10 +843,15 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
 
     // ── Render loop ──
     const clock = new THREE.Clock()
+    let prevFrameTime = performance.now()
 
     const animate = () => {
       frameIdRef.current = requestAnimationFrame(animate)
       controls.update()
+
+      const nowMs = performance.now()
+      const dt = Math.min((nowMs - prevFrameTime) / 1000, 0.05)
+      prevFrameTime = nowMs
 
       const t = clock.getElapsedTime()
       const camDir = camera.position.clone().normalize()
@@ -526,6 +881,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
         }
       })
 
+      updateJourney(dt, t)
       renderer.render(scene, camera)
     }
     animate()
@@ -544,6 +900,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     return () => {
       cancelAnimationFrame(frameIdRef.current)
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+      if (figureResumeTimer) clearTimeout(figureResumeTimer)
       window.removeEventListener('resize', handleResize)
       renderer.domElement.removeEventListener('mousedown', pauseRotate)
       renderer.domElement.removeEventListener('touchstart', pauseRotate)

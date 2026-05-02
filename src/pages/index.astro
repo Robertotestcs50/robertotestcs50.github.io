@@ -8,6 +8,7 @@ import ScrollReveal from '../components/react/ScrollReveal';
 import ParallaxPhoto from '../components/react/ParallaxPhoto';
 import ProjectCard from '../components/ProjectCard.astro';
 import GameCanvas from '../components/react/GameCanvas';
+import HeroLearningAnimation from '../components/react/HeroLearningAnimation';
 import heroWalking from '../assets/hero-walking.png';
 
 type Project = CollectionEntry<'projects'>;
@@ -34,6 +35,9 @@ const skills = [
     class="relative min-h-screen flex flex-col justify-center px-6 sm:px-8 lg:px-12 pt-32 pb-24 overflow-hidden"
     aria-label="Hero"
   >
+    <!-- Neural network + walking figure animation (decorative) -->
+    <HeroLearningAnimation client:idle />
+
     <!-- Background gradient -->
     <div
       class="absolute inset-0 pointer-events-none"
@@ -41,7 +45,7 @@ const skills = [
       style="background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,92,0,0.04) 0%, transparent 70%);"
     ></div>
 
-    <div class="max-w-[1400px] mx-auto w-full">
+    <div class="max-w-[1400px] mx-auto w-full" style="position: relative; z-index: 2;">
       <p
         class="font-mono text-xs uppercase tracking-widest text-muted mb-8"
         style="letter-spacing: 0.15em;"
@@ -56,8 +60,12 @@ const skills = [
         Roberto<br />Zúñiga
       </h1>
 
+      <h2 class="hero-tagline">
+        Learning<span class="learning-dot">.</span><span class="learning-dot">.</span><span class="learning-dot">.</span>
+      </h2>
+
       <p
-        class="mt-8 text-muted max-w-2xl"
+        class="mt-6 text-muted max-w-2xl"
         style="font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.6;"
       >
         Building products that combine design, engineering and AI for measurable

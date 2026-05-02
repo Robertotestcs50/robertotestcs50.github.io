@@ -104,17 +104,12 @@ export default function DevModeToggle({ projects }: Props) {
 
   return (
     <>
-      {/* Toggle pill */}
+      {/* Toggle pill — positioned by .devmode-pill-wrapper in global.css */}
       <div
         ref={pillRef}
         role="group"
         aria-label="View mode"
-        style={{
-          position: 'fixed',
-          top: 'clamp(1rem, 2vw, 1.25rem)',
-          right: 'clamp(1rem, 2vw, 1.25rem)',
-          zIndex: 300,
-        }}
+        className="devmode-pill-wrapper"
       >
         {/* Keyboard shortcut hint (first visit) */}
         <AnimatePresence>
