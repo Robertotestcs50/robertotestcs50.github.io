@@ -503,6 +503,8 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
       africaDashTimer: 0 as number,
       currentCrumb: null as THREE.Mesh | null,
       interactionPaused: false as boolean,
+      thoughtPulses: [] as { line: THREE.Line; startTime: number }[],
+      lastPulseTime: -2 as number,
     }
 
     // Check if a journey stop is near a project pin (within ~2.5°)
@@ -527,7 +529,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
       )
       const arc = new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
-        new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.22 }),
+        new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.45 }),
       )
       scene.add(arc)
     }
@@ -644,7 +646,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     // ── Trail line ───────────────────────────────────────────────────────────────
     const trailLine = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints([new THREE.Vector3()]),
-      new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.18 }),
+      new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.6 }),
     )
     scene.add(trailLine)
     journey.trailLine = trailLine
@@ -672,6 +674,16 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     }
     journey.africaMadridLine = makeAfricaArc(40.4168, -3.7038)
     journey.africaLoganLine = makeAfricaArc(41.7370, -111.8338)
+
+    // Draw the full network immediately (all pin-to-pin arcs visible from frame 1)
+    {
+      const pins = pinWorldRef.current.filter(Boolean)
+      for (let a = 0; a < pins.length; a++) {
+        for (let b = a + 1; b < pins.length; b++) {
+          drawPermanentArc(a, b)
+        }
+      }
+    }
 
     // Reduced motion: draw all project-pin arcs instantly + show Africa lines static
     if (reducedMotion.current) {
@@ -805,6 +817,41 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
         ;(journey.currentCrumb.material as THREE.MeshBasicMaterial).opacity =
           0.45 + 0.45 * (0.5 + 0.5 * Math.sin(elapsed * 2))
       }
+
+      // Thought pulses — brief bright arcs between random pins every 2s
+      const allPins = pinWorldRef.current.filter(Boolean)
+      if (elapsed - journey.lastPulseTime >= 2 && allPins.length >= 2) {
+        journey.lastPulseTime = elapsed
+        const idxA = Math.floor(Math.random() * allPins.length)
+        let idxB = Math.floor(Math.random() * (allPins.length - 1))
+        if (idxB >= idxA) idxB++
+        const pts = Array.from({ length: 24 }, (_, i) =>
+          slerpOnSphere(allPins[idxA], allPins[idxB], i / 23, 1.06),
+        )
+        const pulseLine = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(pts),
+          new THREE.LineBasicMaterial({
+            color: 0xff5c00,
+            transparent: true,
+            opacity: 0.7,
+          }),
+        )
+        scene.add(pulseLine)
+        journey.thoughtPulses.push({ line: pulseLine, startTime: elapsed })
+      }
+
+      // Fade and remove expired thought pulses
+      journey.thoughtPulses = journey.thoughtPulses.filter(({ line, startTime }) => {
+        const age = elapsed - startTime
+        if (age >= 1.5) {
+          scene.remove(line)
+          line.geometry.dispose()
+          ;(line.material as THREE.Material).dispose()
+          return false
+        }
+        ;(line.material as THREE.MeshBasicMaterial).opacity = 0.7 * (1 - age / 1.5)
+        return true
+      })
     }
 
     // ── OrbitControls (Bug 4: zoom enabled; Bug 7: keys disabled) ──

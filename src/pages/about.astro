@@ -5,6 +5,7 @@ import SkillsGrid from '../components/react/SkillsGrid';
 import MagneticButton from '../components/react/MagneticButton';
 import { Image } from 'astro:assets';
 import aboutPhoto from '../assets/about-photo.jpg';
+import ParallaxPhoto from '../components/react/ParallaxPhoto';
 
 const skillColumns = [
   {
@@ -92,21 +93,18 @@ const toolGroups = [
       </p>
     </ScrollReveal>
 
-    <!-- About photo -->
-    <ScrollReveal client:visible delay={0.2}>
-      <div class="mt-14" style="max-width: 900px; margin-top: 3.5rem;">
-        <Image
-          src={aboutPhoto}
-          alt="Roberto Zúñiga working with collaborators"
-          width={900}
-          height={506}
-          format="webp"
-          loading="lazy"
-          class="w-full rounded-2xl"
-          style="aspect-ratio: 16/9; object-fit: cover; object-position: center 30%;"
-        />
-      </div>
-    </ScrollReveal>
+    <!-- About photo — parallax scroll effect -->
+    <div class="mt-14" style="max-width: 900px;">
+      <ParallaxPhoto
+        client:visible
+        src={aboutPhoto.src}
+        alt="Roberto Zúñiga working with collaborators"
+        width={aboutPhoto.width}
+        height={aboutPhoto.height}
+        aspectRatio="16/9"
+        objectPosition="center 30%"
+      />
+    </div>
   </section>
 
   <!-- Divider -->
