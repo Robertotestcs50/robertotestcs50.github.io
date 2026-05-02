@@ -1,9 +1,12 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import SEO from '../components/SEO.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import CustomCursor from '../components/react/CustomCursor';
+import DevModeToggle from '../components/react/DevModeToggle';
 import '../styles/global.css';
 
 interface Props {
@@ -15,6 +18,20 @@ interface Props {
 }
 
 const { title, description, image, noindex, class: className } = Astro.props;
+
+const rawProjects = await getCollection('projects');
+const projectsForDevMode = await Promise.all(
+  rawProjects
+    .sort((a, b) => a.data.order - b.data.order)
+    .map(async (p) => ({
+      slug: p.id,
+      title: p.data.title,
+      subtitle: p.data.subtitle,
+      date: p.data.date.toISOString(),
+      location: p.data.location ?? null,
+      cover: (await getImage({ src: p.data.cover, width: 320 })).src,
+    }))
+);
 ---
 
 <!doctype html>
@@ -42,6 +59,9 @@ const { title, description, image, noindex, class: className } = Astro.props;
 
     <!-- Custom cursor (desktop only) -->
     <CustomCursor client:load />
+
+    <!-- Dev mode toggle — always visible, every page -->
+    <DevModeToggle client:load projects={projectsForDevMode} />
 
     <Nav />
 

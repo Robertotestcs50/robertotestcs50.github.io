@@ -37,6 +37,14 @@ const projects = defineCollection({
           })
         )
         .optional(),
+      location: z
+        .object({
+          city: z.string(),
+          country: z.string(),
+          lat: z.number(),
+          lng: z.number(),
+        })
+        .optional(),
       tags: z.array(z.string()).optional(),
       videos: z
         .array(

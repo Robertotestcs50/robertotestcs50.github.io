@@ -223,6 +223,22 @@
     color: var(--color-foreground);
   }
 
+  /* Dev mode — prevent body scroll when overlay is open */
+  body[data-devmode="open"] {
+    overflow: hidden;
+  }
+
+  /* Dev mode stat strip — tabular numbers */
+  .devmode-overlay-content {
+    font-feature-settings: "tnum";
+  }
+
+  /* Dev mode pulse animation */
+  @keyframes dmPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
   /* Grain animation */
   @keyframes grain {
     0%, 100% { transform: translate(0, 0); }
