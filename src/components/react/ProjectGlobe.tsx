@@ -188,7 +188,7 @@ function InfoCard({
           fontFamily: 'var(--font-mono)',
           fontSize: '10px',
           letterSpacing: '0.1em',
-          color: '#FF5C00',
+          color: '#C8E6FF',
           marginBottom: '0.3rem',
           textTransform: 'uppercase',
         }}
@@ -374,10 +374,10 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     })
 
     const PIN_GEO = new THREE.SphereGeometry(0.012, 8, 8)
-    const PIN_MAT = new THREE.MeshBasicMaterial({ color: 0xff5c00 })
+    const PIN_MAT = new THREE.MeshBasicMaterial({ color: 0xc8e6ff })
     const GLOW_GEO = new THREE.SphereGeometry(0.028, 8, 8)
     const GLOW_MAT = new THREE.MeshBasicMaterial({
-      color: 0xff5c00,
+      color: 0xc8e6ff,
       transparent: true,
       opacity: 0.28,
       blending: THREE.AdditiveBlending,
@@ -401,7 +401,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
         )
         const stem = new THREE.Mesh(
           new THREE.CylinderGeometry(0.003, 0.003, 0.06, 4),
-          new THREE.MeshBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.65 }),
+          new THREE.MeshBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.65 }),
         )
         stem.position.copy(stemCenter)
         stem.quaternion.copy(quat)
@@ -432,7 +432,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
         // Decorative base ring at city anchor
         const ring = new THREE.Mesh(
           new THREE.RingGeometry(0.014, 0.024, 20),
-          new THREE.MeshBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.55, side: THREE.DoubleSide }),
+          new THREE.MeshBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.55, side: THREE.DoubleSide }),
         )
         ring.position.copy(baseAnchor)
         ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), surfaceNormal)
@@ -459,7 +459,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
           scene.add(
             new THREE.Line(
               lineGeo,
-              new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.35 }),
+              new THREE.LineBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.35 }),
             ),
           )
 
@@ -539,7 +539,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
       )
       const arc = new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
-        new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.45 }),
+        new THREE.LineBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.55 }),
       )
       scene.add(arc)
     }
@@ -657,7 +657,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     // ── Trail line ───────────────────────────────────────────────────────────────
     const trailLine = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints([new THREE.Vector3()]),
-      new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.6 }),
+      new THREE.LineBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.6 }),
     )
     scene.add(trailLine)
     journey.trailLine = trailLine
@@ -671,7 +671,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
       )
       const geo = new THREE.BufferGeometry().setFromPoints(pts)
       const mat = new THREE.LineDashedMaterial({
-        color: 0xff5c00,
+        color: 0xc8e6ff,
         dashSize: 0.04,
         gapSize: 0.025,
         transparent: true,
@@ -686,14 +686,27 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
     journey.africaMadridLine = makeAfricaArc(40.4168, -3.7038)
     journey.africaLoganLine = makeAfricaArc(41.7370, -111.8338)
 
-    // Draw the full network immediately (all pin-to-pin arcs visible from frame 1)
+    // Restore visited project pins from sessionStorage (persists across navigation)
     {
-      const pins = pinWorldRef.current.filter(Boolean)
-      for (let a = 0; a < pins.length; a++) {
-        for (let b = a + 1; b < pins.length; b++) {
-          drawPermanentArc(a, b)
+      try {
+        const saved = sessionStorage.getItem('globe-visited-projects')
+        if (saved) {
+          const visited: number[] = JSON.parse(saved)
+          const maxIdx = projectsWithLocation.length
+          visited.forEach(idx => {
+            if (Number.isInteger(idx) && idx >= 0 && idx < maxIdx) {
+              journey.visitedPins.add(idx)
+            }
+          })
+          // Redraw arcs for all restored visited-pin pairs
+          const pins = Array.from(journey.visitedPins)
+          for (let a = 0; a < pins.length; a++) {
+            for (let b = a + 1; b < pins.length; b++) {
+              drawPermanentArc(pins[a], pins[b])
+            }
+          }
         }
-      }
+      } catch { /* ignore corrupt storage */ }
     }
 
     // Reduced motion: draw all project-pin arcs instantly + show Africa lines static
@@ -707,7 +720,7 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
           scene.add(
             new THREE.Line(
               new THREE.BufferGeometry().setFromPoints(pts),
-              new THREE.LineBasicMaterial({ color: 0xff5c00, transparent: true, opacity: 0.2 }),
+              new THREE.LineBasicMaterial({ color: 0xc8e6ff, transparent: true, opacity: 0.2 }),
             ),
           )
         }
@@ -753,6 +766,10 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
         const nearPin = getPinNear(stop.lat, stop.lng)
         if (nearPin !== null && !journey.visitedPins.has(nearPin)) {
           journey.visitedPins.add(nearPin)
+          // Persist so the network survives navigation
+          try {
+            sessionStorage.setItem('globe-visited-projects', JSON.stringify(Array.from(journey.visitedPins)))
+          } catch { /* ignore */ }
           if (journey.visitedPins.size > 1) {
             Array.from(journey.visitedPins)
               .filter((p) => p !== nearPin)
@@ -839,26 +856,30 @@ export default function ProjectGlobe({ projects, onSwitchToTimeline }: Props) {
           0.45 + 0.45 * (0.5 + 0.5 * Math.sin(elapsed * 2))
       }
 
-      // Thought pulses — brief bright arcs between random pins every 2s
-      const allPins = pinWorldRef.current.filter(Boolean)
-      if (elapsed - journey.lastPulseTime >= 2 && allPins.length >= 2) {
+      // Thought pulses — only between already-visited project pins
+      const visitedArr = Array.from(journey.visitedPins)
+      if (elapsed - journey.lastPulseTime >= 2 && visitedArr.length >= 2) {
         journey.lastPulseTime = elapsed
-        const idxA = Math.floor(Math.random() * allPins.length)
-        let idxB = Math.floor(Math.random() * (allPins.length - 1))
-        if (idxB >= idxA) idxB++
-        const pts = Array.from({ length: 24 }, (_, i) =>
-          slerpOnSphere(allPins[idxA], allPins[idxB], i / 23, 1.06),
-        )
-        const pulseLine = new THREE.Line(
-          new THREE.BufferGeometry().setFromPoints(pts),
-          new THREE.LineBasicMaterial({
-            color: 0xff5c00,
-            transparent: true,
-            opacity: 0.7,
-          }),
-        )
-        scene.add(pulseLine)
-        journey.thoughtPulses.push({ line: pulseLine, startTime: elapsed })
+        const rA = Math.floor(Math.random() * visitedArr.length)
+        const remaining = visitedArr.filter((_, i) => i !== rA)
+        const rB = remaining[Math.floor(Math.random() * remaining.length)]
+        const posA = pinWorldRef.current[visitedArr[rA]]
+        const posB = pinWorldRef.current[rB]
+        if (posA && posB) {
+          const pts = Array.from({ length: 24 }, (_, i) =>
+            slerpOnSphere(posA, posB, i / 23, 1.06),
+          )
+          const pulseLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(pts),
+            new THREE.LineBasicMaterial({
+              color: 0xc8e6ff,
+              transparent: true,
+              opacity: 0.7,
+            }),
+          )
+          scene.add(pulseLine)
+          journey.thoughtPulses.push({ line: pulseLine, startTime: elapsed })
+        }
       }
 
       // Fade and remove expired thought pulses

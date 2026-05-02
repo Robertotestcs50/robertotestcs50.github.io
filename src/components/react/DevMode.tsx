@@ -33,7 +33,7 @@ function LoadingSpinner() {
       <div style={{
         width: 20, height: 20,
         border: '2px solid rgba(255,255,255,0.08)',
-        borderTopColor: '#FF5C00',
+        borderTopColor: '#C8E6FF',
         borderRadius: '50%',
         animation: 'spin 0.7s linear infinite',
       }} />
@@ -149,10 +149,10 @@ export default function DevMode({ projects, visible, onClose, activeView, onView
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{
-                width: 6, height: 6, borderRadius: '50%', background: '#FF5C00', flexShrink: 0,
+                width: 6, height: 6, borderRadius: '50%', background: '#C8E6FF', flexShrink: 0,
                 animation: prefersReduced ? 'none' : 'dmPulse 2s ease-in-out infinite',
               }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.12em', color: '#FF5C00', textTransform: 'uppercase' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.12em', color: '#C8E6FF', textTransform: 'uppercase' }}>
                 Dev Mode
               </span>
             </div>

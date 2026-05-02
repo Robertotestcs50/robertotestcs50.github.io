@@ -92,7 +92,7 @@ function drawPlayer(ctx: CanvasRenderingContext2D, p: Player, canvasH: number) {
 
   // Glow
   ctx.shadowBlur = 20;
-  ctx.shadowColor = p.dead ? '#FF2020' : '#FF5C00';
+  ctx.shadowColor = p.dead ? '#FF2020' : '#C8E6FF';
 
   if (p.dead) {
     ctx.translate(cx, p.y + PLAYER_H);
@@ -172,7 +172,7 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, canvasH: num
       const heights = [8, 14, 10];
       const totalW = barW * 3 + 4;
       let bx = obs.x;
-      ctx.fillStyle = 'rgba(255,92,0,0.7)';
+      ctx.fillStyle = 'rgba(200,230,255,0.7)';
       heights.forEach((bh, i) => {
         ctx.fillRect(bx + i * (barW + 2), gY - bh, barW, bh);
       });
@@ -207,11 +207,11 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, canvasH: num
       ctx.lineTo(8, 9);    // bottom-right
       ctx.lineTo(-8, 9);   // bottom-left
       ctx.closePath();
-      ctx.fillStyle = '#FF5C00';
+      ctx.fillStyle = '#C8E6FF';
       ctx.fill();
 
       // Handle arc
-      ctx.strokeStyle = '#FF5C00';
+      ctx.strokeStyle = '#C8E6FF';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(9, 0, 5, -Math.PI / 2, Math.PI / 2);
@@ -265,7 +265,7 @@ function drawHUD(
   const scoreText = `${score.toLocaleString()} m`;
   const bestText = `BEST  ${best.toLocaleString()} m`;
 
-  ctx.fillStyle = flash ? '#FAFAFA' : '#FF5C00';
+  ctx.fillStyle = flash ? '#FAFAFA' : '#C8E6FF';
   ctx.fillText(scoreText, canvasW - 16, 14);
 
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
@@ -468,6 +468,9 @@ export default function GameCanvas() {
   // Keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Never intercept keys when the user is typing in an input or textarea
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return
       if (e.code !== 'Space') return;
       e.preventDefault();
       const s = state.current;

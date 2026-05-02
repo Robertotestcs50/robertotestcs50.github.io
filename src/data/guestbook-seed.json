@@ -1,10 +1,3 @@
 {
-  "entries": [
-    { "name": "Maya R.", "country": "🇺🇸", "message": "Inspired.", "date": "2026-04-12" },
-    { "name": "Diego V.", "country": "🇪🇸", "message": "Increíble portfolio.", "date": "2026-03-28" },
-    { "name": "Sarah K.", "country": "🇬🇧", "message": "The globe is brilliant.", "date": "2026-04-02" },
-    { "name": "Hiroshi T.", "country": "🇯🇵", "message": "Beautiful work.", "date": "2026-04-18" },
-    { "name": "Anna L.", "country": "🇩🇪", "message": "Keep building.", "date": "2026-04-22" },
-    { "name": "Pierre D.", "country": "🇫🇷", "message": "Très impressionnant.", "date": "2026-04-25" }
-  ]
+  "entries": []
 }

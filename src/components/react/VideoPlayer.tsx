@@ -202,7 +202,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
         fontSize: '11px',
         textTransform: 'uppercase',
         letterSpacing: '0.1em',
-        color: 'var(--color-accent, #FF5C00)',
+        color: 'var(--color-accent, #C8E6FF)',
         marginBottom: '0.75rem',
       }}>
         {title}
@@ -267,7 +267,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
           }}>
             <div style={{
               width: 8, height: 8, borderRadius: '50%',
-              background: 'var(--color-accent, #FF5C00)',
+              background: 'var(--color-accent, #C8E6FF)',
               animation: 'vp-pulse 1.5s ease-in-out infinite',
             }} />
           </div>
@@ -308,10 +308,10 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
               width: isMobile ? 96 : 80,
               height: isMobile ? 96 : 80,
               borderRadius: '50%',
-              background: playBtnHovered ? 'rgba(255,92,0,0.85)' : 'rgba(10,10,10,0.65)',
+              background: playBtnHovered ? 'rgba(200,230,255,0.85)' : 'rgba(10,10,10,0.65)',
               backdropFilter: 'blur(16px)',
               border: playBtnHovered
-                ? '1.5px solid rgba(255,92,0,0.9)'
+                ? '1.5px solid rgba(200,230,255,0.9)'
                 : '1.5px solid rgba(255,255,255,0.4)',
               boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -405,7 +405,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
                 <div style={{
                   position: 'absolute', left: 0, top: 0, bottom: 0,
                   width: `${progress}%`,
-                  background: 'var(--color-accent, #FF5C00)',
+                  background: 'var(--color-accent, #C8E6FF)',
                   borderRadius: 2,
                   transition: dragging.current ? 'none' : 'width 0.1s linear',
                 }} />
@@ -415,7 +415,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
                   left: `${progress}%`,
                   transform: 'translate(-50%, -50%)',
                   width: 10, height: 10, borderRadius: '50%',
-                  background: 'var(--color-accent, #FF5C00)',
+                  background: 'var(--color-accent, #C8E6FF)',
                   opacity: showControls || isMobile ? 1 : 0,
                   transition: reduceMotion ? 'none' : 'opacity 0.2s',
                 }} />

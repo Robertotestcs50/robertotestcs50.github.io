@@ -88,7 +88,7 @@ export default function PhaseCarousel({ title, images, autoPlayInterval = 3000 }
             fontSize: '11px',
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
-            color: 'var(--color-accent, #FF5C00)',
+            color: 'var(--color-accent, #C8E6FF)',
             margin: 0,
           }}
         >
@@ -232,7 +232,7 @@ export default function PhaseCarousel({ title, images, autoPlayInterval = 3000 }
               border: 'none',
               cursor: 'pointer',
               padding: 0,
-              background: i === current ? 'var(--color-accent, #FF5C00)' : 'rgba(255,255,255,0.3)',
+              background: i === current ? 'var(--color-accent, #C8E6FF)' : 'rgba(255,255,255,0.3)',
               transition: 'background 0.2s',
               flexShrink: 0,
             }}

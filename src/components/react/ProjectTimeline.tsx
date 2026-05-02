@@ -98,7 +98,7 @@ function ProjectNode({
             fontFamily: 'var(--font-sans)',
             fontSize: '15px',
             fontWeight: 500,
-            color: hovered ? '#FF5C00' : '#FAFAFA',
+            color: hovered ? '#C8E6FF' : '#FAFAFA',
             transition: prefersReduced ? 'none' : 'color 0.2s ease',
             lineHeight: 1.25,
             marginBottom: '0.2rem',
@@ -130,8 +130,8 @@ function ProjectNode({
     width: 12,
     height: 12,
     borderRadius: '50%',
-    background: '#FF5C00',
-    boxShadow: hovered ? '0 0 12px rgba(255,92,0,0.7)' : '0 0 6px rgba(255,92,0,0.35)',
+    background: '#C8E6FF',
+    boxShadow: hovered ? '0 0 12px rgba(200,230,255,0.7)' : '0 0 6px rgba(200,230,255,0.35)',
     flexShrink: 0,
     position: 'relative',
     zIndex: 2,
@@ -276,8 +276,8 @@ export default function ProjectTimeline({ projects }: Props) {
                   width: 10,
                   height: 10,
                   borderRadius: '50%',
-                  background: '#FF5C00',
-                  boxShadow: '0 0 6px rgba(255,92,0,0.4)',
+                  background: '#C8E6FF',
+                  boxShadow: '0 0 6px rgba(200,230,255,0.4)',
                 }}
               />
               {yearPositions[getYear(project.date)] === i && (

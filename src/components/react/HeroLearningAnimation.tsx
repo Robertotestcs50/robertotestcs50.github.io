@@ -41,7 +41,7 @@ interface PendNode {
 
 const WALK_SPEED      = 35    // px / sec
 const PAUSE_DUR       = 3.0   // s
-const NODE_DELAY      = 1.5   // s after departure before node fades in
+const NODE_DELAY      = 1.0   // s after departure before node fades in
 const NODE_FADE_DUR   = 2.0   // s for node appearance animation
 const MAX_WP          = 12
 const STALE_MS        = 30 * 60 * 1000
@@ -116,7 +116,7 @@ const NodeDot = React.memo(function NodeDot({
   return (
     <g>
       <circle cx={cx} cy={cy} r={9}
-        fill="rgba(255,92,0,0.1)"
+        fill="rgba(200,230,255,0.1)"
         style={{ filter: 'blur(5px)', transformOrigin: `${cx}px ${cy}px` }}
       />
       <circle cx={cx} cy={cy} r={3}
@@ -150,7 +150,7 @@ const ConnLine = React.memo(function ConnLine({
 
   return (
     <line x1={x1} y1={y1} x2={x2} y2={y2}
-      stroke="rgba(255,92,0,0.18)" strokeWidth={0.7}
+      stroke="rgba(200,230,255,0.18)" strokeWidth={0.7}
       strokeDasharray={len} strokeDashoffset={off}
       style={{ transition: c.drawn ? 'stroke-dashoffset 1.5s cubic-bezier(0.65,0,0.35,1)' : 'none' }}
     />
@@ -335,11 +335,28 @@ export default function HeroLearningAnimation() {
     // ── Transition to walking state ──
     const startWalking = () => {
       const d = dimsRef.current
-      const from = WAYPOINTS[st.wpIdx]
-      const toIdx = (st.wpIdx + 1) % WAYPOINTS.length
+      const leavingIdx = st.wpIdx   // the waypoint we're about to leave
+      const wp = WAYPOINTS[leavingIdx]
+      const toIdx = (leavingIdx + 1) % WAYPOINTS.length
       const to = WAYPOINTS[toIdx]
 
-      st.p0 = { x: from.x * d.w, y: from.y * d.h }
+      // Node for the waypoint we're LEAVING — countdown starts NOW (figure just left)
+      const isNew = !st.visitedSet.has(leavingIdx) && nodesRef.current.length < MAX_WP
+      if (isNew) {
+        st.visitedSet.add(leavingIdx)
+        st.pending.push({
+          wpIdx: leavingIdx,
+          xPct: wp.x, yPct: wp.y,
+          timer: NODE_DELAY,   // 1.0s from this exact moment
+          fadeElapsed: 0,
+          nodeId: `n${Date.now()}-${leavingIdx}`,
+          nodeIdx: -1,
+          appearing: false,
+          connected: false,
+        })
+      }
+
+      st.p0 = { x: wp.x * d.w, y: wp.y * d.h }
       st.p2 = { x: to.x * d.w, y: to.y * d.h }
       st.p1 = ctrlPt(st.p0, st.p2, st.ctrlSide)
       st.ctrlSide = -st.ctrlSide as 1 | -1
@@ -361,23 +378,7 @@ export default function HeroLearningAnimation() {
       const d = dimsRef.current
       const wp = WAYPOINTS[st.wpIdx]
 
-      // Schedule node appearance if this is a new waypoint
-      const isNew = !st.visitedSet.has(st.wpIdx) && nodesRef.current.length < MAX_WP
-      if (isNew) {
-        st.visitedSet.add(st.wpIdx)
-        st.pending.push({
-          wpIdx: st.wpIdx,
-          xPct: wp.x, yPct: wp.y,
-          timer: NODE_DELAY,
-          fadeElapsed: 0,
-          nodeId: `n${Date.now()}-${st.wpIdx}`,
-          nodeIdx: -1,
-          appearing: false,
-          connected: false,
-        })
-      }
-
-      // Snap figure to exact waypoint
+      // Snap figure to exact waypoint (node creation deferred until startWalking)
       st.figX = wp.x * d.w
       st.figY = wp.y * d.h
     }
@@ -583,12 +584,12 @@ function StaticNetwork() {
         {nodes.map((a, i) => nodes.slice(i + 1).map((b, j) => (
           <line key={`s-${i}-${j}`}
             x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy}
-            stroke="rgba(255,92,0,0.18)" strokeWidth={0.7}
+            stroke="rgba(200,230,255,0.18)" strokeWidth={0.7}
           />
         )))}
         {nodes.map((n, i) => (
           <g key={`sn-${i}`}>
-            <circle cx={n.cx} cy={n.cy} r={9} fill="rgba(255,92,0,0.1)" style={{ filter: 'blur(5px)' }} />
+            <circle cx={n.cx} cy={n.cy} r={9} fill="rgba(200,230,255,0.1)" style={{ filter: 'blur(5px)' }} />
             <circle cx={n.cx} cy={n.cy} r={3} fill="rgba(255,255,255,0.9)" />
           </g>
         ))}
