@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 
 interface Project {
   slug: string;
@@ -27,13 +28,69 @@ export default function WorkFilter({ projects }: Props) {
     active === 'All' ? projects : projects.filter((p) => p.year === active);
 
   return (
-    <div>
+    <>
+      <style>{`
+        .proj-card .card-arrow {
+          opacity: 0;
+          transform: translate(-8px, 8px) rotate(-12deg);
+          transition: opacity 400ms cubic-bezier(0.4,0,0.2,1),
+                      transform 400ms cubic-bezier(0.4,0,0.2,1);
+        }
+        .proj-card:hover .card-arrow {
+          opacity: 1;
+          transform: translate(0,0) rotate(0deg);
+        }
+        @keyframes arrowNudge {
+          0%,100% { transform: translate(0,0); }
+          50%      { transform: translate(2px,-2px); }
+        }
+        .proj-card:hover .card-arrow svg {
+          animation: arrowNudge 1.4s ease-in-out infinite;
+        }
+        .proj-card .card-title {
+          transform: translateY(0);
+          opacity: 1;
+          transition: transform 500ms cubic-bezier(0.4,0,0.2,1),
+                      opacity 300ms ease;
+        }
+        .proj-card .card-subtitle {
+          transform: translateY(100%);
+          opacity: 0;
+          transition: transform 500ms cubic-bezier(0.4,0,0.2,1),
+                      opacity 300ms ease;
+        }
+        .proj-card:hover .card-title {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        .proj-card:hover .card-subtitle {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        @media (hover: none) {
+          .proj-card .card-title { transform: none !important; opacity: 1 !important; }
+          .proj-card .card-subtitle {
+            position: relative !important;
+            transform: none !important;
+            opacity: 1 !important;
+            margin-top: 0.25rem;
+          }
+          .card-text-stack { height: auto !important; overflow: visible !important; }
+          .proj-card .card-arrow { opacity: 0.6 !important; transform: none !important; }
+          .proj-card:hover .card-arrow svg { animation: none !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .proj-card .card-title, .proj-card .card-subtitle,
+          .proj-card .card-arrow, .proj-card:hover .card-title,
+          .proj-card:hover .card-subtitle {
+            transition-duration: 0ms !important;
+            animation: none !important;
+          }
+        }
+      `}</style>
+
       {/* Year filter chips */}
-      <div
-        role="group"
-        aria-label="Filter by year"
-        className="flex flex-wrap gap-2 mb-16"
-      >
+      <div role="group" aria-label="Filter by year" className="flex flex-wrap gap-2 mb-16">
         {YEARS.map((year) => (
           <button
             key={year}
@@ -51,10 +108,7 @@ export default function WorkFilter({ projects }: Props) {
       </div>
 
       {/* Grid */}
-      <motion.div
-        layout
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-      >
+      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
         {filtered.map((project, i) => (
           <motion.article
             key={project.slug}
@@ -66,10 +120,14 @@ export default function WorkFilter({ projects }: Props) {
           >
             <a
               href={`/projects/${project.slug}`}
-              className="group block"
+              className="proj-card block cursor-pointer"
               aria-label={`View ${project.title} — ${project.subtitle}`}
             >
-              <div className="relative overflow-hidden rounded-2xl bg-subtle aspect-video mb-4">
+              {/* Image wrap */}
+              <div
+                className="relative overflow-hidden rounded-2xl bg-subtle mb-4"
+                style={{ aspectRatio: '4/3' }}
+              >
                 <img
                   src={project.cover}
                   alt={project.coverAlt || project.title}
@@ -77,27 +135,67 @@ export default function WorkFilter({ projects }: Props) {
                   height={project.coverHeight}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.04]"
+                  className="w-full h-full object-cover"
+                  style={{ transition: 'transform 700ms cubic-bezier(0.4,0,0.2,1)' }}
+                  onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+                  onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                 />
-                {/* Meta reveal on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-end p-6">
-                  <p className="font-mono text-xs uppercase tracking-widest text-foreground/80">
-                    {project.year}
-                  </p>
+                {/* Arrow badge */}
+                <div
+                  className="card-arrow absolute"
+                  style={{
+                    top: '1rem', right: '1rem',
+                    width: 40, height: 40,
+                    background: 'rgba(255,255,255,0.1)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '9999px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff',
+                  }}
+                >
+                  <ArrowUpRight size={18} />
                 </div>
               </div>
-              <div className="px-1">
-                <h2 className="text-lg font-semibold tracking-tight text-foreground group-hover:text-accent transition-colors duration-300">
+
+              {/* Text slide-swap */}
+              <div
+                className="card-text-stack px-1"
+                style={{ position: 'relative', height: '1.75rem', overflow: 'hidden' }}
+              >
+                <span
+                  className="card-title"
+                  style={{
+                    position: 'absolute', top: 0, left: 0, right: 0,
+                    display: 'block',
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 500,
+                    fontSize: '1.125rem',
+                    color: 'var(--color-foreground)',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}
+                >
                   {project.title}
-                </h2>
-                <p className="font-mono text-xs uppercase tracking-widest text-muted mt-1">
+                </span>
+                <span
+                  className="card-subtitle"
+                  style={{
+                    position: 'absolute', top: 0, left: 0, right: 0,
+                    display: 'block',
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 400,
+                    fontSize: '0.95rem',
+                    color: 'var(--color-muted)',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}
+                >
                   {project.subtitle}
-                </p>
+                </span>
               </div>
             </a>
           </motion.article>
         ))}
       </motion.div>
-    </div>
+    </>
   );
 }

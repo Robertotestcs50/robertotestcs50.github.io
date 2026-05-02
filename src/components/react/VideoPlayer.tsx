@@ -222,6 +222,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
           poster={poster}
           preload="metadata"
           playsInline
+          onClick={togglePlay}
           onTimeUpdate={onTimeUpdate}
           onLoadedMetadata={onLoaded}
           onPlay={onPlay}
@@ -234,6 +235,7 @@ export default function VideoPlayer({ src, poster, title, aspectRatio = '16/9' }
             objectFit: 'contain',
             display: 'block',
             background: '#0A0A0A',
+            cursor: 'pointer',
           }}
         />
 

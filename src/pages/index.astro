@@ -6,6 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import MagneticButton from '../components/react/MagneticButton';
 import ScrollReveal from '../components/react/ScrollReveal';
 import ParallaxPhoto from '../components/react/ParallaxPhoto';
+import { ArrowUpRight } from 'lucide-react';
 import GameCanvas from '../components/react/GameCanvas';
 import heroWalking from '../assets/hero-walking.jpg';
 
@@ -99,29 +100,34 @@ const skills = [
             <article>
               <a
                 href={`/projects/${project.id}`}
-                class="group block"
+                class="proj-card block cursor-pointer"
                 aria-label={`View ${project.data.title} — ${project.data.subtitle}`}
               >
-                <div class="relative overflow-hidden rounded-2xl bg-subtle aspect-video mb-5">
+                <div class="relative overflow-hidden rounded-2xl bg-subtle mb-4" style="aspect-ratio: 4/3;">
                   <Image
                     src={project.data.cover}
                     alt={project.data.title}
                     width={960}
-                    height={540}
+                    height={720}
                     format="webp"
                     loading={i < 2 ? 'eager' : 'lazy'}
-                    class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.04]"
+                    class="w-full h-full object-cover"
+                    style="transition: transform 700ms cubic-bezier(0.4,0,0.2,1);"
                   />
-                </div>
-                <div class="px-1 overflow-hidden">
-                  <div class="translate-y-0 group-hover:-translate-y-0.5 transition-transform duration-500">
-                    <h3 class="text-xl font-semibold tracking-tight text-foreground group-hover:text-accent transition-colors duration-300">
-                      {project.data.title}
-                    </h3>
-                    <p class="font-mono text-xs uppercase tracking-widest text-muted mt-1.5">
-                      {project.data.subtitle}
-                    </p>
+                  <div
+                    class="card-arrow absolute"
+                    style="top:1rem;right:1rem;width:40px;height:40px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.15);border-radius:9999px;display:flex;align-items:center;justify-content:center;color:#fff;"
+                  >
+                    <ArrowUpRight size={18} />
                   </div>
+                </div>
+                <div class="card-text-stack px-1" style="position:relative;height:1.75rem;overflow:hidden;">
+                  <span class="card-title" style="position:absolute;top:0;left:0;right:0;display:block;font-weight:500;font-size:1.125rem;color:var(--color-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    {project.data.title}
+                  </span>
+                  <span class="card-subtitle" style="position:absolute;top:0;left:0;right:0;display:block;font-weight:400;font-size:0.95rem;color:var(--color-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    {project.data.subtitle}
+                  </span>
                 </div>
               </a>
             </article>
