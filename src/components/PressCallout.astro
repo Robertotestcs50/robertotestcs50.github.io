@@ -1,0 +1,112 @@
+---
+const article = {
+  publication: 'El País',
+  context: 'on a class project I contributed to (Africa Crutches)',
+  date: 'February 2025',
+  url: 'https://elpais.com/planeta-futuro/2025-02-14/muletas-made-in-sudan-del-sur-con-un-manual-elaborado-por-universitarios-de-madrid.html',
+}
+---
+
+<section class="press-callout" aria-label="Press">
+  <a
+    href={article.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="press-link"
+  >
+    <span class="press-eyebrow">Featured in</span>
+    <span class="press-name">{article.publication}</span>
+    <span class="press-meta">— {article.context} · {article.date}</span>
+    <span class="press-arrow">↗</span>
+  </a>
+</section>
+
+<style>
+  .press-callout {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 2rem;
+    text-align: center;
+  }
+
+  .press-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    color: rgba(255, 255, 255, 0.55);
+    transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .press-link:hover {
+    color: var(--color-foreground);
+  }
+
+  .press-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: var(--color-accent);
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+                left 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .press-link:hover::after {
+    width: 100%;
+    left: 0;
+  }
+
+  .press-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  .press-name {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.25rem;
+    color: var(--color-foreground);
+    letter-spacing: -0.01em;
+  }
+
+  .press-meta {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .press-arrow {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-accent);
+    margin-left: 0.2rem;
+  }
+
+  @media (max-width: 640px) {
+    .press-link {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .press-meta {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .press-link,
+    .press-link::after {
+      transition: none;
+    }
+  }
+</style>

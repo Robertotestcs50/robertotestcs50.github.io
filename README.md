@@ -1,6 +1,6 @@
 # Roberto Zúñiga — Portfolio
 
-Personal portfolio of Roberto Zúñiga, Designer + Engineer.
+Personal portfolio of Roberto Zúñiga, Designer, Engineer.
 
 **Live site**: [https://robertozuniga.github.io](https://robertozuniga.github.io)
 

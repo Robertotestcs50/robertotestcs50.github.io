@@ -9,6 +9,7 @@ import ParallaxPhoto from '../components/react/ParallaxPhoto';
 import ProjectCard from '../components/ProjectCard.astro';
 import GameCanvas from '../components/react/GameCanvas';
 import HeroLearningAnimation from '../components/react/HeroLearningAnimation';
+import PressCallout from '../components/PressCallout.astro';
 import heroWalking from '../assets/hero-walking.png';
 
 type Project = CollectionEntry<'projects'>;
@@ -163,6 +164,9 @@ const skills = [
       </ScrollReveal>
     </div>
   </section>
+
+  <!-- PRESS CALLOUT -->
+  <PressCallout />
 
   <!-- WALKING PHOTO -->
   <section

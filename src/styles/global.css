@@ -526,3 +526,11 @@
     }
   }
 }
+
+/* Bolded text inside MDX project bodies renders in accent color,
+   turning real numbers into scannable focal points */
+.project-mdx p strong,
+.project-mdx li strong {
+  color: var(--color-accent);
+  font-weight: 500;
+}
