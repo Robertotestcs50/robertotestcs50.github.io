@@ -318,6 +318,10 @@ function obstacleSize(type: ObstacleType, canvasH: number): { w: number; h: numb
 
 const OBS_TYPES: ObstacleType[] = ['figma', 'powerbi', 'laptop', 'coffee'];
 
+// ─── Win condition (hidden easter egg) ───────────────────────────────────────
+
+const WIN_SCORE = 10000 // meters — real skill required
+
 // ─── GameCanvas ───────────────────────────────────────────────────────────────
 
 export default function GameCanvas() {
@@ -329,11 +333,15 @@ export default function GameCanvas() {
   const state = useRef({
     running: false,
     dead: false,
+    won: false,
+    hasSeenWin: false,
     started: false,
     score: 0,
     best: 0,
     flash: false,
     flashTimer: 0,
+    continueFlash: false,
+    continueFlashTimer: 0,
     speed: 4,
     frameCount: 0,
     sinceLastObs: 0,
@@ -346,6 +354,12 @@ export default function GameCanvas() {
     canvasW: 0,
     canvasH: 220,
   });
+
+  const winParticles = useRef<Array<{
+    x: number; y: number; vx: number; vy: number; life: number;
+  }>>([]);
+  const lastTapTime = useRef(0);
+  const singleTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [loopRunning, setLoopRunning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -391,6 +405,8 @@ export default function GameCanvas() {
     s.dead = false;
     s.flash = false;
     s.flashTimer = 0;
+    s.continueFlash = false;
+    s.continueFlashTimer = 0;
     s.obstacles = [];
     s.layers = makeLayers(canvasW, canvasH, s.speed);
     s.player = {
@@ -460,9 +476,24 @@ export default function GameCanvas() {
 
   const restart = useCallback(() => {
     const s = state.current;
-    if (!s.dead) return;
+    if (!s.dead && !s.won) return;
+    if (singleTapTimer.current) { clearTimeout(singleTapTimer.current); singleTapTimer.current = null; }
+    winParticles.current = [];
     initGame();
     s.dead = false;
+    s.won = false;
+    s.hasSeenWin = false;
+  }, []);
+
+  const continueFromWin = useCallback(() => {
+    const s = state.current;
+    if (!s.won) return;
+    if (singleTapTimer.current) { clearTimeout(singleTapTimer.current); singleTapTimer.current = null; }
+    winParticles.current = [];
+    s.won = false;
+    s.speed = isMobileGame.current ? 9 : 8;
+    s.continueFlash = true;
+    s.continueFlashTimer = 60;
   }, []);
 
   // Keyboard
@@ -471,9 +502,14 @@ export default function GameCanvas() {
       // Never intercept keys when the user is typing in an input or textarea
       const tag = (e.target as HTMLElement).tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return
+      const s = state.current;
+      if (s.won) {
+        if (e.code === 'Space') { e.preventDefault(); continueFromWin(); return; }
+        if (e.key.toLowerCase() === 'r') { e.preventDefault(); restart(); return; }
+        return;
+      }
       if (e.code !== 'Space') return;
       e.preventDefault();
-      const s = state.current;
       if (!s.started || s.dead) {
         if (s.dead) restart();
         else jump();
@@ -483,15 +519,31 @@ export default function GameCanvas() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [jump, restart]);
+  }, [jump, restart, continueFromWin]);
 
   // Touch
   const handleTap = useCallback(() => {
     const s = state.current;
-    if (!s.started) jump();
-    else if (s.dead) restart();
-    else jump();
-  }, [jump, restart]);
+    if (!s.started) { jump(); return; }
+    if (s.won) {
+      const now = Date.now();
+      if (now - lastTapTime.current < 350) {
+        // Double-tap → full restart
+        if (singleTapTimer.current) { clearTimeout(singleTapTimer.current); singleTapTimer.current = null; }
+        restart();
+      } else {
+        // Potential single tap — wait to confirm not a double-tap
+        singleTapTimer.current = setTimeout(() => {
+          if (state.current.won) continueFromWin();
+          singleTapTimer.current = null;
+        }, 350);
+      }
+      lastTapTime.current = now;
+      return;
+    }
+    if (s.dead) { restart(); return; }
+    jump();
+  }, [jump, restart, continueFromWin]);
 
   // Game loop tick
   const tick = useCallback(() => {
@@ -507,7 +559,7 @@ export default function GameCanvas() {
 
     // ── Update ──────────────────────────────────────────────────────────────
 
-    if (!s.dead) {
+    if (!s.dead && !s.won) {
       // Speed ramp — faster on mobile
       s.speed += isMobileGame.current ? 0.001 : 0.0008;
       s.score = Math.floor(s.frameCount * s.speed * 0.1);
@@ -590,6 +642,19 @@ export default function GameCanvas() {
         }
       }
 
+      // Win detection (hidden easter egg — one-time per session)
+      if (!s.won && !s.hasSeenWin && s.score >= WIN_SCORE) {
+        s.won = true;
+        s.hasSeenWin = true;
+        const cx = canvasW / 2;
+        const cy = canvasH / 2;
+        winParticles.current = Array.from({ length: 20 }, () => {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1 + Math.random() * 2;
+          return { x: cx, y: cy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1.0 };
+        });
+      }
+
       // Building layers scroll
       if (!prefersReduced) {
         s.layers.forEach((layer) => {
@@ -618,6 +683,10 @@ export default function GameCanvas() {
     if (s.flashTimer > 0) s.flashTimer--;
     else s.flash = false;
 
+    // Continue flash timer
+    if (s.continueFlashTimer > 0) s.continueFlashTimer--;
+    else s.continueFlash = false;
+
     // ── Draw ────────────────────────────────────────────────────────────────
 
     ctx.clearRect(0, 0, canvasW, canvasH);
@@ -642,6 +711,16 @@ export default function GameCanvas() {
     drawPlayer(ctx, p, canvasH);
     drawHUD(ctx, s.score, s.best, s.flash, canvasW);
 
+    // "CONTINUING..." flash
+    if (s.continueFlash && s.continueFlashTimer > 0) {
+      const flashOpacity = s.continueFlashTimer / 60;
+      ctx.fillStyle = `rgba(200, 230, 255, ${flashOpacity})`;
+      ctx.font = 'normal 500 12px "Geist Mono", ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('CONTINUING...', canvasW / 2, 14);
+    }
+
     // State messages
     if (s.dead && p.deadTimer > 24) {
       ctx.font = '13px "Geist Mono", monospace';
@@ -649,6 +728,53 @@ export default function GameCanvas() {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('PRESS SPACE TO RESTART', canvasW / 2, canvasH / 2);
+    }
+
+    // Win overlay
+    if (s.won) {
+      // Update + draw particles
+      winParticles.current.forEach((pt) => {
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= 0.012;
+        if (pt.life > 0) {
+          ctx.fillStyle = `rgba(200, 230, 255, ${pt.life * 0.8})`;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      winParticles.current = winParticles.current.filter((pt) => pt.life > 0);
+
+      // Dim overlay
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.85)';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+
+      // "You win."
+      ctx.fillStyle = '#FAFAFA';
+      ctx.font = 'bold 28px "Geist", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('You win.', canvasW / 2, canvasH / 2 - 16);
+
+      // Italic subtitle
+      ctx.fillStyle = 'rgba(200, 230, 255, 0.85)';
+      ctx.font = 'italic 400 16px "Geist", system-ui, sans-serif';
+      ctx.fillText("Max wasn't reliable.", canvasW / 2, canvasH / 2 + 18);
+
+      // Score
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '400 12px "Geist Mono", monospace';
+      ctx.fillText(`${s.score.toLocaleString()} m`, canvasW / 2, canvasH / 2 + 50);
+
+      // Controls hint
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = 'normal 400 11px "Geist Mono", ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      const hint = isMobileGame.current
+        ? '[TAP] CONTINUE   ·   [DOUBLE-TAP] RESTART'
+        : '[SPACE] CONTINUE   ·   [R] RESTART';
+      ctx.fillText(hint, canvasW / 2, canvasH - 30);
     }
   }, [prefersReduced]);
 

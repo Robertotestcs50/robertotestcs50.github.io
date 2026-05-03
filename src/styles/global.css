@@ -105,11 +105,27 @@
       max-height: 5rem !important;
       margin-top: 0.25rem !important;
     }
-    .proj-card .card-arrow { opacity: 0.6 !important; transform: none !important; }
+    /* Arrow: dim + static by default; bright + animated on active card */
+    .proj-card .card-arrow {
+      opacity: 0.4 !important;
+      transform: none !important;
+      transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1),
+                  background 350ms cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .proj-card.is-active .card-arrow {
+      opacity: 1 !important;
+      background: rgba(255, 255, 255, 0.18) !important;
+      border-color: rgba(255, 255, 255, 0.28) !important;
+    }
+    .proj-card.is-active .card-arrow svg {
+      animation: arrowNudge 1.6s ease-in-out infinite;
+    }
   }
 
   @media (hover: none) and (prefers-reduced-motion: reduce), (max-width: 768px) and (prefers-reduced-motion: reduce) {
     .proj-card .card-subtitle { transition: none !important; }
+    .proj-card.is-active .card-arrow svg { animation: none !important; }
   }
 
   /* Issue 7 — God is great footer element */

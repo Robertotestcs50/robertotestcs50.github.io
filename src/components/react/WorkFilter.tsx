@@ -70,13 +70,32 @@ export default function WorkFilter({ projects }: Props) {
         @media (hover: none) {
           .proj-card .card-title { transform: none !important; opacity: 1 !important; }
           .proj-card .card-subtitle {
-            position: relative !important;
+            position: static !important;
             transform: none !important;
-            opacity: 1 !important;
-            margin-top: 0.25rem;
+            white-space: normal !important;
+            text-overflow: clip !important;
+            /* hidden by default — active-card-observer adds .is-active to show it */
+            opacity: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            margin-top: 0 !important;
+            transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1),
+                        max-height 350ms cubic-bezier(0.4, 0, 0.2, 1),
+                        margin-top 350ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+          }
+          .proj-card.is-active .card-subtitle {
+            opacity: 0.85 !important;
+            max-height: 5rem !important;
+            margin-top: 0.25rem !important;
           }
           .card-text-stack { height: auto !important; overflow: visible !important; }
-          .proj-card .card-arrow { opacity: 0.6 !important; transform: none !important; }
+          /* Arrow: dim by default, bright + animated on active card */
+          .proj-card .card-arrow { opacity: 0.4 !important; transform: none !important;
+            transition: opacity 350ms cubic-bezier(0.4,0,0.2,1) !important; }
+          .proj-card.is-active .card-arrow { opacity: 1 !important;
+            background: rgba(255,255,255,0.18) !important;
+            border-color: rgba(255,255,255,0.28) !important; }
+          .proj-card.is-active .card-arrow svg { animation: arrowNudge 1.6s ease-in-out infinite; }
           .proj-card:hover .card-arrow svg { animation: none !important; }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -121,6 +140,7 @@ export default function WorkFilter({ projects }: Props) {
             <a
               href={`/projects/${project.slug}`}
               className="proj-card block cursor-pointer"
+              data-project-card
               aria-label={`View ${project.title} — ${project.subtitle}`}
             >
               {/* Image wrap */}
