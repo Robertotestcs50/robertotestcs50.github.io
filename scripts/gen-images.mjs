@@ -67,16 +67,16 @@ function makePNG(width, height, r, g, b) {
   ]);
 }
 
-// Light blue #C8E6FF (200, 230, 255) favicon PNGs — matches new accent colour
-writeFileSync(join(publicDir, 'favicon-16.png'), makePNG(16, 16, 200, 230, 255));
-writeFileSync(join(publicDir, 'favicon-32.png'), makePNG(32, 32, 200, 230, 255));
-writeFileSync(join(publicDir, 'apple-touch-icon.png'), makePNG(180, 180, 200, 230, 255));
-writeFileSync(join(publicDir, 'android-chrome-512x512.png'), makePNG(512, 512, 200, 230, 255));
+// Dark #0A0A0A (10, 10, 10) favicon PNGs — dark bg, white RZ
+writeFileSync(join(publicDir, 'favicon-16.png'), makePNG(16, 16, 10, 10, 10));
+writeFileSync(join(publicDir, 'favicon-32.png'), makePNG(32, 32, 10, 10, 10));
+writeFileSync(join(publicDir, 'apple-touch-icon.png'), makePNG(180, 180, 10, 10, 10));
+writeFileSync(join(publicDir, 'android-chrome-512x512.png'), makePNG(512, 512, 10, 10, 10));
 // OG image — dark background solid color (SVG version is the canonical one)
 writeFileSync(join(publicDir, 'og-default.png'), makePNG(1200, 630, 10, 10, 10));
 
-// Also write a minimal .ico (16x16 PNG wrapped) — light blue
-const ico16 = makePNG(16, 16, 200, 230, 255);
+// Also write a minimal .ico (16x16 PNG wrapped) — dark
+const ico16 = makePNG(16, 16, 10, 10, 10);
 // Minimal ICO: 1 image, 16x16, 24bpp
 const icoHeader = Buffer.alloc(6);
 icoHeader.writeUInt16LE(0, 0); // reserved

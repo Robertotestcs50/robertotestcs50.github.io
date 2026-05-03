@@ -9,6 +9,7 @@ import PhaseCarouselGroup from '../../components/react/PhaseCarouselGroup';
 import VideoPlayer from '../../components/react/VideoPlayer';
 import { formatDate } from '../../lib/utils';
 import { ExternalLink, Play, Github, Instagram, Newspaper } from 'lucide-react';
+import Lightbox from '../../components/react/Lightbox';
 
 type Project = CollectionEntry<'projects'>;
 
@@ -61,6 +62,13 @@ if (carouselData) {
 }
 
 const galleryLayout = project.data.galleryLayout ?? 'grid';
+
+const lightboxImages = await Promise.all(
+  (project.data.gallery || []).map(async (img: ImageMetadata, idx: number) => ({
+    src: (await getImage({ src: img, width: 2400 })).src,
+    alt: `${project.data.title} image ${idx + 1}`,
+  }))
+);
 ---
 
 <BaseLayout
@@ -205,51 +213,57 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
             {galleryLayout === 'single' ? (
               <div class="flex flex-col gap-4 mb-16" aria-label="Project gallery">
                 {project.data.gallery.map((img: ImageMetadata, i: number) => (
-                  <div class="overflow-hidden rounded-2xl bg-subtle w-full">
-                    <Image
-                      src={img}
-                      alt={`${project.data.title} — gallery image ${i + 1}`}
-                      width={1200}
-                      height={675}
-                      format="webp"
-                      loading="lazy"
-                      class="w-full object-cover"
-                      style="aspect-ratio: 16/9;"
-                    />
-                  </div>
+                  <a data-lightbox-index={i} href={lightboxImages[i]?.src} onclick="event.preventDefault()" style="display: block;">
+                    <div class="overflow-hidden rounded-2xl bg-subtle w-full">
+                      <Image
+                        src={img}
+                        alt={`${project.data.title} image ${i + 1}`}
+                        width={1200}
+                        height={675}
+                        format="webp"
+                        loading="lazy"
+                        class="w-full object-cover"
+                        style="aspect-ratio: 16/9;"
+                      />
+                    </div>
+                  </a>
                 ))}
               </div>
             ) : galleryLayout === 'grid2col' ? (
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16" aria-label="Project gallery">
                 {project.data.gallery.map((img: ImageMetadata, i: number) => (
-                  <div class="overflow-hidden rounded-2xl bg-subtle">
-                    <Image
-                      src={img}
-                      alt={`${project.data.title} — gallery image ${i + 1}`}
-                      width={600}
-                      height={600}
-                      format="webp"
-                      loading="lazy"
-                      class="w-full object-cover"
-                      style="aspect-ratio: 1/1;"
-                    />
-                  </div>
+                  <a data-lightbox-index={i} href={lightboxImages[i]?.src} onclick="event.preventDefault()" style="display: block;">
+                    <div class="overflow-hidden rounded-2xl bg-subtle">
+                      <Image
+                        src={img}
+                        alt={`${project.data.title} image ${i + 1}`}
+                        width={600}
+                        height={600}
+                        format="webp"
+                        loading="lazy"
+                        class="w-full object-cover"
+                        style="aspect-ratio: 1/1;"
+                      />
+                    </div>
+                  </a>
                 ))}
               </div>
             ) : (
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16" aria-label="Project gallery">
                 {project.data.gallery.map((img: ImageMetadata, i: number) => (
-                  <div class={`overflow-hidden rounded-2xl bg-subtle ${i === 0 ? 'sm:col-span-2' : ''}`}>
-                    <Image
-                      src={img}
-                      alt={`${project.data.title} — gallery image ${i + 1}`}
-                      width={i === 0 ? 1200 : 600}
-                      height={i === 0 ? 675 : (i === 1 ? 450 : 600)}
-                      format="webp"
-                      loading="lazy"
-                      class="w-full h-full object-cover"
-                    />
-                  </div>
+                  <a data-lightbox-index={i} href={lightboxImages[i]?.src} onclick="event.preventDefault()" style="display: block;" class={i === 0 ? 'sm:col-span-2' : ''}>
+                    <div class="overflow-hidden rounded-2xl bg-subtle">
+                      <Image
+                        src={img}
+                        alt={`${project.data.title} image ${i + 1}`}
+                        width={i === 0 ? 1200 : 600}
+                        height={i === 0 ? 675 : (i === 1 ? 450 : 600)}
+                        format="webp"
+                        loading="lazy"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                  </a>
                 ))}
               </div>
             )}
@@ -315,4 +329,8 @@ const galleryLayout = project.data.galleryLayout ?? 'grid';
       </a>
     </div>
   </div>
+
+  {lightboxImages.length > 0 && (
+    <Lightbox client:idle images={lightboxImages} />
+  )}
 </BaseLayout>
