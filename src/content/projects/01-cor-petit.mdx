@@ -11,7 +11,7 @@ location:
   lat: 40.4168
   lng: -3.7038
 featured: true
-order: 3
+order: 2
 cover: ../../assets/projects/01-cor-petit/cover.jpg
 summary: An AI tool that reads facial expressions and speech to measure how hospitalized children feel, without storing a single image.
 description: |
@@ -45,25 +45,22 @@ tags: [AI, Healthcare, Hackathon]
 
 Pediatric specialists rely on what kids can put into words, but young patients in pain, fatigue, or fear often can't. COR PETIT closes that gap by reading the signals their face and voice already give off, adding an objective layer of insight without another invasive test.
 
-## The Problem
+## Context
 
 Young patients in hospital settings frequently struggle to verbalize their emotional state. Traditional assessment tools rely on subjective self-reporting, which is especially limited for children under stress. Clinicians are left to interpret behavior with incomplete information.
 
-## The Approach
+## Approach
 
 Two complementary AI models work in parallel: a computer vision pipeline using FER and MTCNN to analyze facial micro-expressions in real-time video frames, and a 28-class NLP emotion classifier that processes transcribed speech. Neither model stores raw video; only aggregated scores pass to the reporting layer.
 
-## Privacy by Design
+### Privacy by design
 
 Full GDPR and EU AI Act compliance was non-negotiable. Every architectural decision starts from the question: *what is the minimum data needed to be useful?* The answer shapes what gets processed, what gets discarded, and what clinicians actually see.
 
+## My role
+
+I led the product design and integrated the engineering into a single coherent product, owning all visual and interaction design and co-leading the pitch that won the round.
+
 ## Impact
 
-The team **won Best Pitch** at the Hacking Bridge hackathon and
-delivered the working solution to **Talentum Gaudium**, the
-foundation that brought the original problem. My role was to
-**lead the product design and integrate the engineering into a
-single coherent product**, owning all visual and interaction
-design, and co-leading the pitch that won the round. The full
-solution was handed off to Talentum Gaudium for them to take
-forward.
+The team **won Best Pitch** at the Hacking Bridge hackathon and delivered the working solution to **Talentum Gaudium**, the foundation that brought the original problem. The full solution was handed off to Talentum Gaudium for them to take forward.

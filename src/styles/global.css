@@ -535,6 +535,38 @@
   font-weight: 500;
 }
 
+/* Justified body text in project pages */
+.project-mdx p {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Lead-in paragraphs directly under headings stay left-aligned */
+.project-mdx h2 + p,
+.project-mdx h3 + p {
+  text-align: left;
+}
+
+/* Never justify lists, blockquotes */
+.project-mdx blockquote p,
+.project-mdx li,
+.project-mdx ul,
+.project-mdx ol {
+  text-align: left;
+}
+
+/* Fall back to left on narrow viewports */
+@media (max-width: 600px) {
+  .project-mdx p {
+    text-align: left;
+    hyphens: none;
+    -webkit-hyphens: none;
+  }
+}
+
 /* About page — credentials section */
 .about-credentials {
   margin-top: 4rem;

@@ -217,7 +217,7 @@ export default function ProjectTimeline({ projects }: Props) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   const sorted = [...projects].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )
 
   const yearPositions: Record<number, number> = {}

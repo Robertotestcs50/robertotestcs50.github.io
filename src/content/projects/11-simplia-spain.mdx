@@ -45,70 +45,32 @@ links:
 tags: [AI, Startups, Conversational AI]
 ---
 
-## What Simplia does
+Simplia is a conversational AI startup I co-founded. We build agents that handle inbound conversations for Spanish small and medium businesses, 24 hours a day, across WhatsApp, web chat, and phone, in natural Spanish.
 
-For most Spanish small and medium businesses, "24/7 customer
-service" has historically meant either an expensive call center
-or no after-hours service at all. Simplia builds the third option:
-AI agents that handle inbound conversations across WhatsApp,
-web chat, and phone, in natural Spanish, around the clock.
+## Context
 
-## How it's built
+For most Spanish small and medium businesses, "24/7 customer service" has historically meant either an expensive call center or no after-hours service at all. Simplia builds the third option: AI agents that handle inbound conversations in natural Spanish, around the clock. Our first client is **OficinasYA**, a Madrid-based real estate operator, whose entire customer-facing inbound now routes through Simplia.
 
-The product runs on **n8n** for workflow orchestration, with
-**OpenAI and Gemini APIs** powering the reasoning layer,
-**ElevenLabs** for voice synthesis on phone agents, and a custom
-layer for Spanish-language intent recognition tuned against real
-conversation logs from production traffic. The system uses a
-**multi-agent architecture** with specialized agents for routing,
-qualification, scheduling, and handoff, each tuned for its part
-of the conversation. The architecture is built to swap models
-quickly: when a better one ships, we test and integrate it within
-days.
+## Approach
 
-## Live in production
+The product runs on **n8n** for workflow orchestration, with **OpenAI and Gemini APIs** powering the reasoning layer, **ElevenLabs** for voice synthesis on phone agents, and a custom layer for Spanish-language intent recognition tuned against real conversation logs from production traffic. The system uses a **multi-agent architecture** with specialized agents for routing, qualification, scheduling, and handoff, each tuned for its part of the conversation. The architecture is built to swap models quickly: when a better one ships, we test and integrate it within days.
 
-Our first client is **OficinasYA**, a Madrid-based real estate
-operator. Their entire customer-facing inbound channel (WhatsApp
-inbox and website intake) now routes through Simplia. The agent
-has handled **1,114+ production executions** in the live deployment
-so far (verified from n8n analytics, captured at a single point
-during the rollout). Every inbound prospect (looking
-for an office, asking about availability, requesting a tour) gets
-an answer in seconds, day or night.
+### In production
+
+OficinasYA's entire customer-facing inbound channel (WhatsApp inbox and website intake) now routes through Simplia. The agent has handled **1,114+ production executions** in the live deployment so far (verified from n8n analytics, captured at a single point during the rollout). Every inbound prospect (looking for an office, asking about availability, requesting a tour) gets an answer in seconds, day or night.
 
 ## My role
 
-I'm one of two co-founders. My partner and I both work hands-on
-across the full stack: product design, conversational design, brand,
-and the AI infrastructure itself. We share the engineering work:
-n8n flows, prompt engineering, model integration, voice synthesis
-configuration, evaluation pipelines. Neither of us hands the
-"engineering side" to the other; we both ship.
+I'm one of two co-founders. My partner and I both work hands-on across the full stack: product design, conversational design, brand, and the AI infrastructure itself. We share the engineering work: n8n flows, prompt engineering, model integration, voice synthesis configuration, evaluation pipelines. Neither of us hands the "engineering side" to the other; we both ship.
 
-## Academic backing
+### Academic backing
 
-Simplia is the subject of my **TFG (Trabajo de Fin de Grado /
-undergraduate thesis project)**: specifically a study of
-conversational AI development models for small business adoption:
-how to architect, deploy, and validate a multi-channel AI agent
-system that small businesses can actually use without a technical
-team of their own.
+Simplia is the subject of my **TFG (Trabajo de Fin de Grado / undergraduate thesis project)**: specifically a study of conversational AI development models for small business adoption: how to architect, deploy, and validate a multi-channel AI agent system that small businesses can actually use without a technical team of their own.
 
-## Public talk
+### Public talk
 
-I was selected for the **UAX Nova Talent program** (UAX × Nova
-Talent, Spain's emerging-talent cohort) and presented Simplia on
-the main stage at the UAX Nova Talent event, speaking for over
-an hour to the program's final audience about Simplia, my
-journey, and what the program meant to it.
+I was selected for the **UAX Nova Talent program** (UAX × Nova Talent, Spain's emerging-talent cohort) and presented Simplia on the main stage at the UAX Nova Talent event, speaking for over an hour to the program's final audience about Simplia, my journey, and what the program meant to it.
 
 ## Impact
 
-**Live in production** with real customers right now. **OficinasYA's
-entire customer-facing inbound channel** runs through Simplia:
-WhatsApp, website, phone. **1,114+ executions** across the production WhatsApp flow at a
-single point captured during rollout, and the system continues
-to process new conversations as the deployment scales. The product is the subject
-of my **TFG**. I've presented it on the main stage of **UAX Nova
-Talent**. We're now expanding to additional Spanish SMB clients.
+**Live in production** with real customers right now. **OficinasYA's entire customer-facing inbound channel** runs through Simplia: WhatsApp, website, phone. **1,114+ executions** across the production WhatsApp flow at a single point captured during rollout, and the system continues to process new conversations as the deployment scales. The product is the subject of my **TFG**. I've presented it on the main stage of **UAX Nova Talent**. We're now expanding to additional Spanish SMB clients.

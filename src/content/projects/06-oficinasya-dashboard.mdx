@@ -10,7 +10,7 @@ location:
   country: Spain
   lat: 40.3768
   lng: -3.7038
-order: 9
+order: 11
 cover: ../../assets/projects/06-oficinasya-dashboard/cover.jpg
 coverPosition: "center 50%"
 galleryLayout: single
@@ -34,32 +34,29 @@ tags: [Data, BI]
 
 OficinasYA operated across multiple Madrid locations with data scattered across spreadsheets, a CRM, and a property management system. Decisions were made on gut feel because consolidating the data took hours. The dashboard changed that to seconds.
 
-## Data Pipeline
+## Context
 
-Raw data from three sources (financial records in Excel, lead tracking in a CRM export, spatial data from the property system) was cleaned and normalized using Power Query and Python scripts. A star-schema data model connects occupancy, revenue, and pipeline into a single queryable surface.
+Three previously-siloed systems: financial records in Excel, lead tracking in a CRM, spatial data in a property management tool. No single view of how the business actually performed. The brief was to unify them into one decision-making surface.
 
-## Key Views
+## Approach
+
+### Data pipeline
+
+Raw data from all three sources was cleaned and normalized using Power Query and Python scripts. A star-schema data model connects occupancy, revenue, and pipeline into a single queryable surface.
+
+### Key views
 
 - **Executive overview**: occupancy rate, MRR, lead conversion, and net margin in one glance
 - **Location drill-down**: per-property performance with trend lines and target tracking
 - **Lead pipeline**: funnel visualization with time-to-close and source attribution
 - **Forecasting**: 90-day projection model built on seasonal patterns and confirmed contracts
 
-## Outcome
+## My role
 
-The client moved from weekly reporting meetings (where half the time was spent correcting data) to a live dashboard that refreshes on demand. Decision velocity improved measurably.
+I built the full pipeline and dashboard: raw data extraction, cleaning and normalization in Power Query and Python, data modeling, and all Power BI visualization. The client moved from weekly reporting meetings (where half the time was spent correcting data) to a live dashboard that refreshes on demand.
 
 ## Impact
 
-The dashboard gave the OficinasYA team their **first unified view**
-of financial, spatial, and lead-management data: three streams
-that had previously been read separately. The result was a clearer
-understanding of how the business actually performed, delivered as
-a Power BI surface they could query themselves.
+The dashboard gave the OficinasYA team their **first unified view** of financial, spatial, and lead-management data: three streams that had previously been read separately. The result was a clearer understanding of how the business actually performed, delivered as a Power BI surface they could query themselves.
 
-The relationship became long-running: I returned in **summer 2024
-as CEO Assistant**, where I led strategic and operational
-initiatives that contributed to **expansion across 11 new cities
-in 30 days**. The same client is now **Simplia's first live
-deployment**. Their full customer-facing inbound now runs through
-the AI agents we co-founded Simplia to build.
+The relationship became long-running: I returned in **summer 2024 as CEO Assistant**, where I led strategic and operational initiatives that contributed to **expansion across 11 new cities in 30 days**. The same client is now **Simplia's first live deployment**. Their full customer-facing inbound now runs through the AI agents we co-founded Simplia to build.
