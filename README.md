@@ -1,6 +1,6 @@
 # Roberto Zúñiga — Portfolio
  
-A custom-built, design-engineering portfolio for an Exponential Fellowship application. Live at **[robertotestcs50.github.io](https://robertotestcs50.github.io/)**.
+A custom-built, design-engineering portfolio. Live at **[robertotestcs50.github.io](https://robertotestcs50.github.io/)**.
  
 Designed and engineered by Roberto Zúñiga, in collaboration with Claude (Anthropic) for technical implementation. Replaces a previous Framer-built site.
  
